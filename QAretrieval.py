@@ -10,7 +10,7 @@ import os
 api_key = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
 
 # Path to the combined FAISS index file
-combined_faiss_index_path = '../combined_faiss_index.pickle'
+combined_faiss_index_path = 'combined_faiss_index.pickle'
 # Get the current script directory
 #script_dir = os.path.dirname(os.path.abspath(__file__))
 
