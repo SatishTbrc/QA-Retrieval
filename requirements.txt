@@ -18,3 +18,4 @@ faiss-cpu==1.7.2
 tiktoken==0.5.1
 sqlalchemy==2.0.28
 pyodbc==4.0.35
+pandas==1.5.3
