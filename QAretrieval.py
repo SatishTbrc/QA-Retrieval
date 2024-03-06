@@ -12,10 +12,10 @@ import os
 #conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
 
 # Database connection configuration
-server = 'DESKTOP-1B3PJIL'
-database = 'QARetrieval'
+server = '151.106.39.102'
+database = 'GMM_Test'
 username = 'sa'
-password = 'Sqlserver@273.'
+password = 'tsB8x3Yv'
 conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
 
 #os.environ["GOOGLE_API_KEY"] = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
@@ -57,7 +57,7 @@ if st.button("Get Answer"):
         #answer_df.to_sql(name="QARetrieval",con = conn,if_exists='append', index = False)
         with pyodbc.connect(conn_str) as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO QARetrieval (question, answer) VALUES (?, ?)", question, answer)
+            cursor.execute("INSERT INTO tblAIDatabase (question, answer) VALUES (?, ?)", question, answer)
             conn.commit()
         st.success(answer)
     else:
