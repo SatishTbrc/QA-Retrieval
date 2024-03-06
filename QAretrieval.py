@@ -4,11 +4,19 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import GooglePalm
 from langchain.vectorstores import FAISS
 from sqlalchemy import create_engine
+import pyodbc
 import pandas as pd
 import dill
 import os
 
-conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
+#conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
+
+# Database connection configuration
+server = 'DESKTOP-1B3PJIL'
+database = 'QARetrieval'
+username = 'sa'
+password = 'Sqlserver@273.'
+conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
 
 #os.environ["GOOGLE_API_KEY"] = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
 api_key = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
@@ -45,8 +53,12 @@ if st.button("Get Answer"):
         # Run the question-answering chain on the combined documents and question
         docs = combined_faiss_index.similarity_search(question)
         answer = chain.run(input_documents=docs, question=question)
-        answer_df = pd.DataFrame({'question': [question],'answer':[answer]})
-        answer_df.to_sql(name="QARetrieval",con = conn,if_exists='append', index = False)
+        #answer_df = pd.DataFrame({'question': [question],'answer':[answer]})
+        #answer_df.to_sql(name="QARetrieval",con = conn,if_exists='append', index = False)
+        with pyodbc.connect(conn_str) as conn:
+            cursor = conn.cursor()
+            cursor.execute("INSERT INTO QARetrieval (question, answer) VALUES (?, ?)", question, answer)
+            conn.commit()
         st.success(answer)
     else:
         st.warning("Please enter a question.")
