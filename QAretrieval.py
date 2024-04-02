@@ -4,7 +4,6 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import GooglePalm
 from langchain.vectorstores import FAISS
 from sqlalchemy import create_engine
-import pyodbc
 import psycopg2
 import pandas as pd
 import dill
