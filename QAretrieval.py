@@ -5,6 +5,7 @@ from langchain.llms import GooglePalm
 from langchain.vectorstores import FAISS
 from sqlalchemy import create_engine
 import pyodbc
+import psycopg2
 import pandas as pd
 import dill
 import os
@@ -12,11 +13,13 @@ import os
 #conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
 
 # Database connection configuration
-server = '151.106.39.102'
-database = 'GMM_Test'
-username = 'sa'
-password = 'tsB8x3Yv'
-conn_str = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
+host = 'localhost'
+database = 'QA'
+user = 'postgres'
+password = 'Postgre@273.'
+
+# Construct the connection string
+conn_str = f"host={host} dbname={database} user={user} password={password}"
 
 #os.environ["GOOGLE_API_KEY"] = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
 api_key = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
@@ -55,9 +58,9 @@ if st.button("Get Answer"):
         answer = chain.run(input_documents=docs, question=question)
         #answer_df = pd.DataFrame({'question': [question],'answer':[answer]})
         #answer_df.to_sql(name="QARetrieval",con = conn,if_exists='append', index = False)
-        with pyodbc.connect(conn_str) as conn:
+        with psycopg2.connect(conn_str) as conn:
             cursor = conn.cursor()
-            cursor.execute("INSERT INTO tblAIDatabase (question, answer) VALUES (?, ?)", question, answer)
+            cursor.execute("INSERT INTO \"QA retrieval\" (question, answer) VALUES (%s, %s)", (question, answer))
             conn.commit()
         st.success(answer)
     else:
