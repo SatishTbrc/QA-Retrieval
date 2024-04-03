@@ -11,6 +11,9 @@ import os
 
 #conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
 
+database_url = "DATABASE_URL"
+# Now you can use the database_url variable to connect to your Postgres database
+
 # Database connection configuration
 host = 'localhost'
 database = 'QA'
