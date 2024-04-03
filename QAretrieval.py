@@ -11,17 +11,17 @@ import os
 
 #conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
 
-database_url = "DATABASE_URL"
+database_url = os.environ.get("DATABASE_URL")
 # Now you can use the database_url variable to connect to your Postgres database
 
 # Database connection configuration
-host = 'localhost'
-database = 'QA'
-user = 'postgres'
-password = 'Postgre@273.'
+#host = 'localhost'
+#database = 'QA'
+#user = 'postgres'
+#password = 'Postgre@273.'
 
 # Construct the connection string
-conn_str = f"host={host} dbname={database} user={user} password={password}"
+conn_str = database_url
 
 #os.environ["GOOGLE_API_KEY"] = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
 api_key = "AIzaSyBhJTFGzAMfZo7NZFfDk5J7SHjfdmgHTp4"
