@@ -12,10 +12,10 @@ import os
 #conn = create_engine('mssql+pyodbc://DESKTOP-1B3PJIL/QARetrieval?trusted_connection=yes&driver=ODBC Driver 17 for SQL Server')
 
 # Database connection configuration
-host = 'localhost'
-database = 'QA'
-user = 'postgres'
-password = 'Postgre@273.'
+host = 'dpg-co5u6lsf7o1s73a7ql50-a'
+database = 'qa_y9pi'
+user = 'postgre'
+password = 'w75OQFSRMPDv2SMrjEsWR8XoLc5d62rL'
 
 # Construct the connection string
 conn_str = f"host={host} dbname={database} user={user} password={password}"
