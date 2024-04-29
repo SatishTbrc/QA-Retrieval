@@ -4,7 +4,7 @@ import os
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
-database_url = os.environ.get("DATABASE_URL")
+conn_str = os.environ.get("DATABASE_URL")
 
 
 # Database functions
