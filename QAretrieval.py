@@ -241,9 +241,9 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
             return True  # Indicate success
         else:
             st.write(f"Unfortunately, we don’t cover this geography in the Global Market Model, but here are some of the similar geographies you might be interested in:")
-            region_name = find_region_for_country(selected_country, conn_str)
-            if region_name:
-                similar_geographies = get_top_5_geographies_for_market_and_region(selected_market, region_name, conn_str)
+            region = find_region_for_country(selected_country, conn_str)
+            if region:
+                similar_geographies = get_top_5_geographies_for_market_and_region(selected_market, region, conn_str)
                 
                 similar_geographies = [""] + similar_geographies
                 selected_similar_geography = st.selectbox("Select a similar geography:", similar_geographies, key=f"{selected_market}_geo")
