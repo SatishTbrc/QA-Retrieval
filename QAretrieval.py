@@ -77,18 +77,18 @@ def get_top_5_similar_markets_from_database(query, conn_str):
 
 def find_region_for_country(country_name, conn_str):
     query = """
-        SELECT region_name
+        SELECT region
         FROM public.region_country
-        WHERE LOWER(country_name) = LOWER(%s);
+        WHERE LOWER(country) = LOWER(%s);
     """
-    region_name = None
+    region = None
     with psycopg2.connect(conn_str) as conn:
         with conn.cursor() as cursor:
             cursor.execute(query, (country_name,))
             result = cursor.fetchone()
             if result:
-                region_name = result[0]
-    return region_name
+                region = result[0]
+    return region
 
 def get_top_5_geographies_for_market_and_region(selected_market, region_name, conn_str):
     geographies = []
