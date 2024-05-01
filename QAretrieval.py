@@ -364,7 +364,7 @@ def main():
                                         st.write(f"Here's the historical data of {selected_market} for the year 2013-2023:")
                                         for year, value in data.items():
                                             st.write(f"{year} : '{value}'")
-
+                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
                                 elif historical_or_forecast == "Forecast data":
                                     data, error = fetch_answer_from_database(selected_market, "Forecast data", selected_country, conn_str)
                                     if error:
@@ -373,6 +373,7 @@ def main():
                                         st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
                                         for year, value in data.items():
                                             st.write(f"{year} : '{value}'")
+                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                     
                         
