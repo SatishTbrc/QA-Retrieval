@@ -90,21 +90,21 @@ def find_region_for_country(country_name, conn_str):
                 region = result[0]
     return region
 
-def get_top_5_geographies_for_market_and_region(selected_market, region_name, conn_str):
+def get_top_5_geographies_for_market_and_region(selected_market, region, conn_str):
     geographies = []
     query = """
         SELECT DISTINCT md.geography
         FROM public.market_data AS md
-        JOIN public.region_country AS rc ON md.geography = rc.country_name
+        JOIN public.region_country AS rc ON md.geography = rc.country
         WHERE LOWER(md.segment) = LOWER(%s)
-        AND rc.region_name = %s
+        AND rc.region = %s
         AND md.geography IS NOT NULL
         ORDER BY md.geography
         LIMIT 5;
     """
     with psycopg2.connect(conn_str) as conn:
         with conn.cursor() as cursor:
-            cursor.execute(query, (selected_market, region_name))
+            cursor.execute(query, (selected_market, region))
             rows = cursor.fetchall()
             geographies = [row[0] for row in rows]
     return geographies
