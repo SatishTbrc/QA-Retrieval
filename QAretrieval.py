@@ -379,9 +379,9 @@ def main():
                                         st.write(error)
                                     else:
                                         st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
-                                        df = pd.DataFrame(list(data.items()), columns=['Year', 'Value']).T
+                                        df = pd.DataFrame(list(data.items()), columns=['Year', 'Value']).set_index('Year').T
                                         #st.write("Here's the forecast data of {} for the years listed:".format(selected_market))
-                                        st.table(df)
+                                        st.write(df)
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                     
