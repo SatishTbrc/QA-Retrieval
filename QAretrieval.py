@@ -2,9 +2,15 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 import os
-import openai
+from langchain.chains import LLMChain
+from langchain.llms import OpenAI
+from langchain.schema import Prompt
 
-openai.api_key = "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"
+# Setup OpenAI as the LLM (Language Learning Model) for LangChain
+llm = OpenAI(api_key="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")  # Replace with your actual API key
+llm_chain = LLMChain(llm)
+
+#openai.api_key = "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"
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
@@ -35,22 +41,17 @@ def check_data_availability(selected_market, selected_data_type, conn_str):
             row = cursor.fetchone()
             return row
 
-# OpenAI API function to rephrase content
-def rephrase_content(content, prompt):
-    try:
-        response = openai.Completion.create(
-            engine="text-davinci-002",
-            prompt=f"{prompt}\n\nContent:\n{content}\n\nSummary:",
-            temperature=0.7,
-            max_tokens=150,
-            top_p=1.0,
-            frequency_penalty=0.0,
-            presence_penalty=0.0,
-            stop=["\n"]
+def rephrase_with_langchain(content, prompt):
+    # Define the task using LangChain
+    # Create a more structured and context-aware prompt using LangChain's features
+    response = llm_chain.run_task(
+        prompt=Prompt(
+            prompt_text=f"{prompt}\n\nContent:\n{content}\n\nSummary:",
+            stop_sequences=["\n"],  # Define stopping conditions
+            max_tokens=150
         )
-        return response.choices[0].text.strip()
-    except Exception as e:
-        return f"Failed to generate summary: {str(e)}"
+    )
+    return response.text.strip()
 
 def check_global_data_availability(selected_market, conn_str):
     query = """
@@ -342,7 +343,7 @@ def main():
                     prompt = "You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights."
         
                     # Get the rephrased content from OpenAI
-                    rephrased_content = rephrase_content(row[0], prompt)
+                    rephrased_content = rephrase_with_langchain(row[0], prompt)
         
                     # Display the rephrased content
                     st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
