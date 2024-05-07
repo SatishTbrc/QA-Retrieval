@@ -18,3 +18,4 @@ faiss-cpu==1.7.2
 tiktoken==0.5.1
 psycopg2==2.9.9
 pandas==1.5.3
+openai==0.10.2
