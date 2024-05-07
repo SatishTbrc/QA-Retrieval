@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 import os
+import openai
+
+OPENAI_API_KEY = "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"
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
@@ -31,6 +34,23 @@ def check_data_availability(selected_market, selected_data_type, conn_str):
             cursor.execute(query, (selected_market,))
             row = cursor.fetchone()
             return row
+
+# OpenAI API function to rephrase content
+def rephrase_content(content, prompt):
+    try:
+        response = openai.Completion.create(
+            engine="text-davinci-002",
+            prompt=f"{prompt}\n\nContent:\n{content}\n\nSummary:",
+            temperature=0.7,
+            max_tokens=150,
+            top_p=1.0,
+            frequency_penalty=0.0,
+            presence_penalty=0.0,
+            stop=["\n"]
+        )
+        return response.choices[0].text.strip()
+    except Exception as e:
+        return f"Failed to generate summary: {str(e)}"
 
 def check_global_data_availability(selected_market, conn_str):
     query = """
@@ -318,8 +338,15 @@ def main():
             if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                 row = check_data_availability(selected_market, selected_data_type, conn_str)
                 if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
+                    # Here's your custom prompt for the AI to rephrase
+                    prompt = "You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights."
+        
+                    # Get the rephrased content from OpenAI
+                    rephrased_content = rephrase_content(row[0], prompt)
+        
+                    # Display the rephrased content
                     st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
-                    st.write(row[0])
+                    st.write(rephrased_content)
                 else:
                     st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
                     st.write("Let's proceed with the Market Size data.")
