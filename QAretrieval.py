@@ -4,7 +4,7 @@ import psycopg2
 import os
 import openai
 
-OPENAI_API_KEY = "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"
+openai.api_key = "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"
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
