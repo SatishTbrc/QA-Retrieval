@@ -334,12 +334,12 @@ def main():
             if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                 row = check_data_availability(selected_market, selected_data_type, conn_str)
                 if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
-                    user_question = row[0]
+                    
                     llm_chain = LLMChain(
                        prompt=prompt,
                        llm=davinci
                         )
-                    rephrased_content = (llm_chain.run(user_question))
+                    rephrased_content = (llm_chain.run(row[0]))
         
                     # Display the rephrased content
                     st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
