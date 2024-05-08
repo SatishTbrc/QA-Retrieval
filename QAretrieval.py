@@ -7,15 +7,15 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 
 # Set up the API key and the language learning model (LLM) for LangChain
-openai.api_key = "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"  # Replace with your actual API key
-davinci = OpenAI(model_name="text-davinci-003")
+#openai.api_key = "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"  # Replace with your actual API key
+davinci = OpenAI(api_key="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", model_name="text-davinci-003")
 
 # Create a template for how the prompt should be structured
 template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the following content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights:
 
 {content}
 
-Summary:"""
+"""
 
 # Initialize the LLMChain with the template
 prompt_template = PromptTemplate(template=template, input_variables=["content"])
