@@ -2,27 +2,33 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 import os
-from langchain import PromptTemplate
-from langchain import LLMChain
 from langchain.llms import OpenAI
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
-template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. 
-    Generate a summary of the contet from a detailed business research report.
-    The output should be a succinct with bullet points and should distill the essence of the content, highlighting key insights. {question} """
-
-api_key = os.environ.get("API_KEY")
-
-prompt = PromptTemplate(
-   template=template,
-   input_variables=["question"]
-)
-
+# Setting up LangChain for rephrasing text
+api_key = os.getenv("API_KEY")  # Ensure your API key is correctly set in your environment variables
 davinci = OpenAI(api_key=api_key, model_name="gpt-3.5-turbo-instruct")
+template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights:
+
+Content: {content}
+
+Summary:"""
+prompt_template = PromptTemplate(template=template, input_variables=["content"])
+llm_chain = LLMChain(prompt=prompt_template, llm=davinci)
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
 conn_str = os.environ.get("DATABASE_URL")
 
+# Define the function to rephrase content using LangChain
+def rephrase_with_langchain(content):
+    try:
+        rephrased_content = llm_chain.run(content=content)
+        return rephrased_content
+    except Exception as e:
+        st.error(f"Failed to generate rephrased content: {str(e)}")
+        return None
 
 # Database functions
 def check_market_in_database(market_name, conn_str):
@@ -335,19 +341,12 @@ def main():
             if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                 row = check_data_availability(selected_market, selected_data_type, conn_str)
                 if row and row[0]:
-                    llm_chain = LLMChain(
-                       prompt=prompt,
-                       llm=davinci
-                        )
-                    try:
-                        
-                        # Attempt to rephrase content using LangChain
-                        rephrased_content = llm_chain.run(row[0])
-                        st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
+                    rephrased_content = rephrase_with_langchain(row[0])
+                    if rephrased_content:
+                        st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_market} market:")
                         st.write(rephrased_content)
-                    except Exception as e:
-                        st.error(f"Failed to generate rephrased content: {e}")# Checks that row is not None and row[0] is not an empty string or other falsy value
-                    
+                    else:
+                        st.write("Unable to rephrase the content at this time.")
                 else:
                     st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
                     st.write("Let's proceed with the Market Size data.")
