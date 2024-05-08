@@ -190,8 +190,12 @@ def handle_selected_market(selected_market):
                 if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                     row = check_data_availability(selected_similar_market, selected_data_type, conn_str)
                     if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
-                        st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_similar_market} market:")
-                        st.write(row[0])
+                        rephrased_content = rephrase_with_langchain(row[0])
+                        if rephrased_content:
+                            st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_similar_market} market:")
+                            st.write(rephrased_content)
+                        else:
+                            st.write("Unable to rephrase the content at this time.")
                     else:
                         st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
                         st.write("Let's proceed with the Market Size data.")
