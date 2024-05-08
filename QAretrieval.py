@@ -30,6 +30,26 @@ def rephrase_with_langchain(content):
         st.error(f"Failed to generate rephrased content: {str(e)}")
         return None
 
+def save_to_database(selected_market, selected_data_type, rephrased_content, conn_str):
+    with psycopg2.connect(conn_str) as conn:
+        with conn.cursor() as cursor:
+            # Check if the entry already exists
+            check_query = """
+                SELECT COUNT(*) FROM output_data WHERE Market = %s AND Data = %s
+            """
+            cursor.execute(check_query, (selected_market, selected_data_type))
+            exists = cursor.fetchone()[0]
+
+            if exists == 0:  # If the entry does not exist, insert new data
+                insert_query = """
+                    INSERT INTO output_data (Market, Data, Answer) VALUES (%s, %s, %s)
+                """
+                cursor.execute(insert_query, (selected_market, selected_data_type, rephrased_content))
+                conn.commit()
+                st.success("Data successfully saved to the database.")
+            else:
+                st.info("Entry already exists in the database. No new data saved.")
+
 # Database functions
 def check_market_in_database(market_name, conn_str):
     query = """
@@ -349,6 +369,7 @@ def main():
                     if rephrased_content:
                         st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_market} market:")
                         st.write(rephrased_content)
+                        save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                     else:
                         st.write("Unable to rephrase the content at this time.")
                 else:
