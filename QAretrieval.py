@@ -333,17 +333,20 @@ def main():
 
             if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                 row = check_data_availability(selected_market, selected_data_type, conn_str)
-                if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
-                    
+                if row and row[0]:
                     llm_chain = LLMChain(
                        prompt=prompt,
                        llm=davinci
                         )
-                    rephrased_content = (llm_chain.run(row[0]))
-        
-                    # Display the rephrased content
-                    st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
-                    st.write(rephrased_content)
+                    try:
+                        
+                        # Attempt to rephrase content using LangChain
+                        rephrased_content = llm_chain.run(row[0])
+                        st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
+                        st.write(rephrased_content)
+                    except Exception as e:
+                        st.error(f"Failed to generate rephrased content: {e}")# Checks that row is not None and row[0] is not an empty string or other falsy value
+                    
                 else:
                     st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
                     st.write("Let's proceed with the Market Size data.")
