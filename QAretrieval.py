@@ -46,9 +46,8 @@ def save_to_database(selected_market, selected_data_type, rephrased_content, con
                 """
                 cursor.execute(insert_query, (selected_market, selected_data_type, rephrased_content))
                 conn.commit()
-                st.success("Data successfully saved to the database.")
-            else:
-                st.info("Entry already exists in the database. No new data saved.")
+                #st.success("Data successfully saved to the database.")
+            
 
 # Database functions
 def check_market_in_database(market_name, conn_str):
@@ -214,6 +213,7 @@ def handle_selected_market(selected_market):
                         if rephrased_content:
                             st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_similar_market} market:")
                             st.write(rephrased_content)
+                            save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
                         else:
                             st.write("Unable to rephrase the content at this time.")
                     else:
