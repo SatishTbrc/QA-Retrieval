@@ -10,13 +10,14 @@ template = """You are an experienced business analyst skilled in summarizing com
     Generate a summary of the contet from a detailed business research report.
     The output should be a succinct with bullet points and should distill the essence of the content, highlighting key insights. {question} """
 
-#openai.api_key = "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"
+api_key = os.environ.get("API_KEY")
+
 prompt = PromptTemplate(
    template=template,
    input_variables=["question"]
 )
 
-davinci = OpenAI(api_key="sk-proj-rqnbeB0RiboTB2iyhCFxT3BlbkFJ6RfiFxRj2CsUPWJBaxEo", model_name="gpt-3.5-turbo-instruct")
+davinci = OpenAI(api_key=api_key, model_name="gpt-3.5-turbo-instruct")
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
