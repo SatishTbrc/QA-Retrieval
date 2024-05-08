@@ -2,15 +2,24 @@ import streamlit as st
 import pandas as pd
 import psycopg2
 import os
-from langchain.chains import LLMChain
 from langchain.llms import OpenAI
-from langchain.schema import Prompt
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
 
-# Setup OpenAI as the LLM (Language Learning Model) for LangChain
-llm = OpenAI(api_key="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")  # Replace with your actual API key
-llm_chain = LLMChain(llm)
+# Set up the API key and the language learning model (LLM) for LangChain
+openai.api_key = "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"  # Replace with your actual API key
+davinci = OpenAI(model_name="text-davinci-003")
 
-#openai.api_key = "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"
+# Create a template for how the prompt should be structured
+template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the following content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights:
+
+{content}
+
+Summary:"""
+
+# Initialize the LLMChain with the template
+prompt_template = PromptTemplate(template=template, input_variables=["content"])
+llm_chain = LLMChain(prompt=prompt_template, llm=davinci)
 
 # Database connection configuration
 #conn_str = "host=localhost port=5432 dbname=AI_tool user=postgres password=Postgre@273."
@@ -41,17 +50,10 @@ def check_data_availability(selected_market, selected_data_type, conn_str):
             row = cursor.fetchone()
             return row
 
-def rephrase_with_langchain(content, prompt):
-    # Define the task using LangChain
-    # Create a more structured and context-aware prompt using LangChain's features
-    response = llm_chain.run_task(
-        prompt=Prompt(
-            prompt_text=f"{prompt}\n\nContent:\n{content}\n\nSummary:",
-            stop_sequences=["\n"],  # Define stopping conditions
-            max_tokens=150
-        )
-    )
-    return response.text.strip()
+# Function to rephrase content using the LangChain LLMChain
+def rephrase_with_langchain(content):
+    result = llm_chain.run(content=content)
+    return result
 
 def check_global_data_availability(selected_market, conn_str):
     query = """
@@ -340,10 +342,10 @@ def main():
                 row = check_data_availability(selected_market, selected_data_type, conn_str)
                 if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
                     # Here's your custom prompt for the AI to rephrase
-                    prompt = "You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights."
+                    #prompt = "You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights."
         
                     # Get the rephrased content from OpenAI
-                    rephrased_content = rephrase_with_langchain(row[0], prompt)
+                    rephrased_content = rephrase_with_langchain(row[0])
         
                     # Display the rephrased content
                     st.write(f"Here's the content for {selected_data_type.lower()} for the {selected_market} market:")
