@@ -35,14 +35,14 @@ def save_to_database(selected_market, selected_data_type, rephrased_content, con
         with conn.cursor() as cursor:
             # Check if the entry already exists
             check_query = """
-                SELECT COUNT(*) FROM output_data WHERE Market = %s AND Data = %s
+                SELECT COUNT(*) FROM output_data WHERE "Market" = LOWER(%s) AND "Data" = LOWER(%s)
             """
             cursor.execute(check_query, (selected_market, selected_data_type))
             exists = cursor.fetchone()[0]
 
             if exists == 0:  # If the entry does not exist, insert new data
                 insert_query = """
-                    INSERT INTO output_data (Market, Data, Answer) VALUES (%s, %s, %s)
+                    INSERT INTO output_data ("Market", "Data", "Answer") VALUES (LOWER(%s), LOWER(%s), LOWER(%s))
                 """
                 cursor.execute(insert_query, (selected_market, selected_data_type, rephrased_content))
                 conn.commit()
