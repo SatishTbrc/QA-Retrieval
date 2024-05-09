@@ -376,14 +376,14 @@ def main():
                     """
                     cursor.execute(fetch_answer_query, (selected_market, selected_data_type))
                     rephrased_content = cursor.fetchone()[0]
-                    st.write(f"Content for {selected_data_type.lower()} for the {selected_market} market:")
+                    st.write(f"Content for {selected_data_type.lower()} for the {selected_market} market: fetching from output" )
                     st.write(rephrased_content)
                 else:
                     row = check_data_availability(selected_market, selected_data_type, conn_str)
                     if row and row[0]:
                         rephrased_content = rephrase_with_langchain(row[0])
                         if rephrased_content:
-                            st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_market} market:")
+                            st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_market} market: fetching from market")
                             st.write(rephrased_content)
                             save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                         else:
