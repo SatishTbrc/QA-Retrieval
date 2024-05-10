@@ -392,7 +392,10 @@ def main():
                 # Try to fetch existing rephrased content from the database
                 rephrased_content = fetch_from_output(selected_market, selected_data_type, conn_str)
                 if rephrased_content:
-                    st.write(f"Content for {selected_data_type.lower()} for the {selected_market} market:")
+                    if selected_data_type == "Market Trends":
+                        st.write(f"Key trends in the {selected_market} market are:")
+                    if selected_data_type == "Competitive Landscape":
+                        st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                     st.write(rephrased_content)
                 else:
                     row = check_data_availability(selected_market, selected_data_type, conn_str)
