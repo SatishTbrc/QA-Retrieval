@@ -494,10 +494,11 @@ def main():
                                     else:
                                         st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
                                         # Convert the dictionary to a DataFrame for horizontal display
-                                        data_df = pd.DataFrame(list(data.items()), columns=['Year', 'Value']).T  # Transpose to switch rows and columns
-                                        data_df.columns = data_df.iloc[0]  # Set the first row as column headers
-                                        data_df = data_df[1:]  # Remove the first row since it's now the header
-
+                                        data_df = pd.DataFrame(list(data.items()), columns=['Year', 'Value'])
+        
+                                        # Transpose the DataFrame
+                                        data_df = data_df.set_index('Year').T  # Transpose with Year as index
+        
                                         st.table(data_df)
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
