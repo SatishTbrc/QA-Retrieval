@@ -392,7 +392,7 @@ def main():
     if 'country' not in st.session_state:  # Add this line to initialize the 'country' variable
         st.session_state.country = ""
 
-    selected_market = st.text_input(value=st.session_state.market)
+    selected_market = st.text_input(,value=st.session_state.market)
 
     if selected_market:
         success_selected_market = handle_selected_market(selected_market)
