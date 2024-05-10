@@ -378,8 +378,10 @@ def main():
     st.set_page_config("Question Answering App", layout="wide")
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
-    st.title("Question Answering")
-    st.subheader("Hello! How can I assist you today? Please specify which market you are seeking information on? You can type the market name or browse from a list.")
+    st.title("Global Market Model AI-bot")
+    st.header("Helping you find market information")
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
     if 'market' not in st.session_state:
         st.session_state.market = ""
