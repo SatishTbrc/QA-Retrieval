@@ -220,8 +220,8 @@ def handle_selected_market(selected_market):
                 selected_data_type = None
 
                 data_type_options = ["Market Size", "Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]
-                selected_data_type = st.selectbox("What type of data are you looking for?", [""] + data_type_options)
-                if selected_data_type:
+                selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
+                if selected_data_type != "Select Option Below":
                     st.session_state.data_type = selected_data_type
 
                 if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
@@ -384,8 +384,8 @@ def main():
             selected_data_type = None
 
             data_type_options = ["Market Size", "Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]
-            selected_data_type = st.selectbox("What type of data are you looking for?", [""] + data_type_options)
-            if selected_data_type:
+            selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
+            if selected_data_type != "Select Option Below":
                 st.session_state.data_type = selected_data_type
 
             if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
