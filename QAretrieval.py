@@ -493,13 +493,20 @@ def main():
                                         st.write(error)
                                     else:
                                         st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
-                                        # Convert the dictionary to a DataFrame for horizontal display
-                                        data_df = pd.DataFrame(list(data.items()), columns=['Year', 'Value'])
-        
-                                        # Transpose the DataFrame
-                                        data_df = data_df.set_index('Year').T  # Transpose with Year as index
-        
-                                        st.table(data_df)
+                                        # Prepare data for display
+                                        years = list(data.keys())  # Extract years
+                                        values = list(data.values())  # Extract corresponding values
+
+                                        # Create a DataFrame with 'Year' and 'Value' as rows
+                                        data_df = pd.DataFrame({
+                                            'Year': years,
+                                            'Value': values
+                                        }).T  # Transpose to switch rows and columns
+
+                                        # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                        data_df.columns = range(1, len(years) + 1)
+
+                                        st.table(data_df) 
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                     
