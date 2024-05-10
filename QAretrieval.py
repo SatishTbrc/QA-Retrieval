@@ -276,8 +276,22 @@ def handle_selected_market(selected_market):
                                     st.write(error)
                                 else:
                                     st.write(f"Here's the historical data of {selected_similar_market} for the year 2013-2023:")
-                                    for year, value in data.items():
-                                        st.write(f"{year} : '{value}'")
+                                    # Prepare data for display
+                                    years = list(data.keys())  # Extract years
+                                    values = list(data.values())  # Extract corresponding values
+                                    currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                    # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                    data_df = pd.DataFrame({
+                                        'Year': years,
+                                        'Value': values,
+                                        'Currency': currency
+                                    }).T  # Transpose to switch rows and columns
+
+                                    # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                    data_df.columns = range(1, len(years) + 1)
+
+                                    st.table(data_df)
                                     st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                             elif historical_or_forecast == "Forecast data":
@@ -286,8 +300,22 @@ def handle_selected_market(selected_market):
                                     st.write(error)
                                 else:
                                     st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023-2033:")
-                                    for year, value in data.items():
-                                        st.write(f"{year} : '{value}'")
+                                    # Prepare data for display
+                                    years = list(data.keys())  # Extract years
+                                    values = list(data.values())  # Extract corresponding values
+                                    currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                    # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                    data_df = pd.DataFrame({
+                                        'Year': years,
+                                        'Value': values,
+                                        'Currency': currency
+                                    }).T  # Transpose to switch rows and columns
+
+                                    # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                    data_df.columns = range(1, len(years) + 1)
+
+                                    st.table(data_df)
                                     st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
                         elif data_available_at_global_level:
                             selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
@@ -304,8 +332,22 @@ def handle_selected_market(selected_market):
                                             st.write(error)
                                         else:
                                             st.write(f"Here's the historical data of {selected_similar_market} for the year 2013 - 2023:")
-                                            for year, value in data.items():
-                                                st.write(f"{year} : '{value}'")
+                                            # Prepare data for display
+                                            years = list(data.keys())  # Extract years
+                                            values = list(data.values())  # Extract corresponding values
+                                            currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                            # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                            data_df = pd.DataFrame({
+                                            'Year': years,
+                                            'Value': values,
+                                            'Currency': currency
+                                            }).T  # Transpose to switch rows and columns
+
+                                            # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                            data_df.columns = range(1, len(years) + 1)
+
+                                            st.table(data_df)
                                             st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                                     elif historical_or_forecast == "Forecast data":
@@ -314,8 +356,22 @@ def handle_selected_market(selected_market):
                                             st.write(error)
                                         else:
                                             st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023 - 2033:")
-                                            for year, value in data.items():
-                                                st.write(f"{year} : '{value}'")
+                                            # Prepare data for display
+                                            years = list(data.keys())  # Extract years
+                                            values = list(data.values())  # Extract corresponding values
+                                            currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                            # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                            data_df = pd.DataFrame({
+                                                'Year': years,
+                                                'Value': values,
+                                                'Currency': currency
+                                            }).T  # Transpose to switch rows and columns
+
+                                            # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                            data_df.columns = range(1, len(years) + 1)
+
+                                            st.table(data_df)
                                             st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
 
@@ -353,8 +409,22 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(error)
                             else:
                                 st.write(f"Here's the historical data of {selected_market} for the year 2013 - 2023:")
-                                for year, value in data.items():
-                                    st.write(f"{year} : '{value}'")
+                                # Prepare data for display
+                                years = list(data.keys())  # Extract years
+                                values = list(data.values())  # Extract corresponding values
+                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                data_df = pd.DataFrame({
+                                    'Year': years,
+                                    'Value': values,
+                                    'Currency': currency
+                                }).T  # Transpose to switch rows and columns
+
+                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                data_df.columns = range(1, len(years) + 1)
+
+                                st.table(data_df)
                                 st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                         elif historical_or_forecast == "Forecast data":
@@ -363,8 +433,22 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(error)
                             else:
                                 st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
-                                for year, value in data.items():
-                                    st.write(f"{year} : '{value}'")
+                                # Prepare data for display
+                                years = list(data.keys())  # Extract years
+                                values = list(data.values())  # Extract corresponding values
+                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                data_df = pd.DataFrame({
+                                    'Year': years,
+                                    'Value': values,
+                                    'Currency': currency
+                                }).T  # Transpose to switch rows and columns
+
+                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                data_df.columns = range(1, len(years) + 1)
+
+                                st.table(data_df)
                                 st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
             else:
                 st.error("Please enter a valid geography.")
@@ -457,8 +541,22 @@ def main():
                                 st.write(error)
                             else:
                                 st.write(f"Here's the historical data of {selected_market} for the year 2013-2023:")
-                                for year, value in data.items():
-                                    st.write(f"{year} : '{value}'")
+                                # Prepare data for display
+                                years = list(data.keys())  # Extract years
+                                values = list(data.values())  # Extract corresponding values
+                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                data_df = pd.DataFrame({
+                                    'Year': years,
+                                    'Value': values,
+                                    'Currency': currency
+                                }).T  # Transpose to switch rows and columns
+
+                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                data_df.columns = range(1, len(years) + 1)
+
+                                st.table(data_df)
                                 st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
                         elif historical_or_forecast == "Forecast data":
                             data, error = fetch_answer_from_database(selected_market, "Forecast data", "global", conn_str)
@@ -466,8 +564,22 @@ def main():
                                 st.write(error)
                             else:
                                 st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
-                                for year, value in data.items():
-                                    st.write(f"{year} : '{value}'")
+                                # Prepare data for display
+                                years = list(data.keys())  # Extract years
+                                values = list(data.values())  # Extract corresponding values
+                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                data_df = pd.DataFrame({
+                                    'Year': years,
+                                    'Value': values,
+                                    'Currency': currency
+                                }).T  # Transpose to switch rows and columns
+
+                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                data_df.columns = range(1, len(years) + 1)
+
+                                st.table(data_df)
                                 st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
                     elif data_available_at_global_level:
                         selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
@@ -484,8 +596,22 @@ def main():
                                         st.write(error)
                                     else:
                                         st.write(f"Here's the historical data of {selected_market} for the year 2013-2023:")
-                                        for year, value in data.items():
-                                            st.write(f"{year} : '{value}'")
+                                        # Prepare data for display
+                                        years = list(data.keys())  # Extract years
+                                        values = list(data.values())  # Extract corresponding values
+                                        currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+
+                                        # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
+                                        data_df = pd.DataFrame({
+                                            'Year': years,
+                                            'Value': values,
+                                            'Currency': currency
+                                        }).T  # Transpose to switch rows and columns
+
+                                        # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
+                                        data_df.columns = range(1, len(years) + 1)
+
+                                        st.table(data_df)
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
                                 elif historical_or_forecast == "Forecast data":
                                     data, error = fetch_answer_from_database(selected_market, "Forecast data", selected_country, conn_str)
@@ -496,17 +622,19 @@ def main():
                                         # Prepare data for display
                                         years = list(data.keys())  # Extract years
                                         values = list(data.values())  # Extract corresponding values
+                                        currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
 
-                                        # Create a DataFrame with 'Year' and 'Value' as rows
+                                        # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
                                         data_df = pd.DataFrame({
                                             'Year': years,
-                                            'Value': values
+                                            'Value': values,
+                                            'Currency': currency
                                         }).T  # Transpose to switch rows and columns
 
                                         # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
                                         data_df.columns = range(1, len(years) + 1)
 
-                                        st.table(data_df) 
+                                        st.table(data_df)
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
                     
