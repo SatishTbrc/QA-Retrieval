@@ -362,6 +362,8 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
 
 def main():
     st.set_page_config("Question Answering App", layout="wide")
+    logo_path = "logo-TBRC.png"
+    st.image(logo_path, width=200)
     st.title("Question Answering")
     st.subheader("Hello! How can I assist you today? Please specify which market you are seeking information on? You can type the market name or browse from a list.")
 
