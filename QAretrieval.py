@@ -379,7 +379,7 @@ def main():
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
-    st.header("Helping you find market information")
+    st.write("Helping you find market information")
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
@@ -392,7 +392,7 @@ def main():
     if 'country' not in st.session_state:  # Add this line to initialize the 'country' variable
         st.session_state.country = ""
 
-    selected_market = st.text_input("Enter the market you need information about:", value=st.session_state.market)
+    selected_market = st.text_input(value=st.session_state.market)
 
     if selected_market:
         success_selected_market = handle_selected_market(selected_market)
