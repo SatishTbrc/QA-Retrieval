@@ -225,78 +225,84 @@ def handle_selected_market(selected_market):
                     st.session_state.data_type = selected_data_type
 
                 if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
-                    row = check_data_availability(selected_similar_market, selected_data_type, conn_str)
-                    if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
-                        rephrased_content = rephrase_with_langchain(row[0])
-                        if rephrased_content:
-                            st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_similar_market} market:")
-                            st.write(rephrased_content)
-                            save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
-                        else:
-                            st.write("Unable to rephrase the content at this time.")
+                    # Try to fetch existing rephrased content from the database
+                    rephrased_content = fetch_from_output(selected_similar_market, selected_data_type, conn_str)
+                    if rephrased_content:
+                        st.write(f"Content for {selected_data_type.lower()} for the {selected_similar_market} market:")
+                        st.write(rephrased_content)
                     else:
-                        st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
-                        st.write("Let's proceed with the Market Size data.")
-                        selected_data_type = "Market Size"
+                        row = check_data_availability(selected_similar_market, selected_data_type, conn_str)
+                        if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
+                            rephrased_content = rephrase_with_langchain(row[0])
+                            if rephrased_content:
+                                st.write(f"Content for {selected_data_type.lower()} for the {selected_similar_market} market:")
+                                st.write(rephrased_content)
+                                save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
+                            else:
+                                st.write("Unable to rephrase the content at this time.")
+                        else:
+                            st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
+                            st.write("Let's proceed with the Market Size data.")
+                            selected_data_type = "Market Size"
 
-                if selected_data_type == "Market Size":
-                    data_available_at_global_level = False
-                    if check_data_availability(selected_similar_market, selected_data_type, conn_str):
-                        data_available_at_global_level = check_global_data_availability(selected_similar_market, conn_str)
+                    if selected_data_type == "Market Size":
+                        data_available_at_global_level = False
+                        if check_data_availability(selected_similar_market, selected_data_type, conn_str):
+                            data_available_at_global_level = check_global_data_availability(selected_similar_market, conn_str)
 
-                    if data_available_at_global_level:
-                        if data_available_at_global_level == 'Global':
-                            # Handle the global case
-                            st.write("Data available only at a global level.")
-                            historical_or_forecast = st.radio("Do you need historical data or forecasts?", ["Select option below","Historical data", "Forecast data"])
+                        if data_available_at_global_level:
+                            if data_available_at_global_level == 'Global':
+                                # Handle the global case
+                                st.write("Data available only at a global level.")
+                                historical_or_forecast = st.radio("Do you need historical data or forecasts?", ["Select option below","Historical data", "Forecast data"])
                                 
-                            if historical_or_forecast == "Historical data":
-                                data, error = fetch_answer_from_database(selected_similar_market, "Historical data", "global", conn_str)
-                                if error:
-                                    st.write(error)
-                                else:
-                                    st.write(f"Here's the historical data of {selected_similar_market} for the year 2013-2023:")
-                                    for year, value in data.items():
-                                        st.write(f"{year} : '{value}'")
-                                    st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                if historical_or_forecast == "Historical data":
+                                    data, error = fetch_answer_from_database(selected_similar_market, "Historical data", "global", conn_str)
+                                    if error:
+                                        st.write(error)
+                                    else:
+                                        st.write(f"Here's the historical data of {selected_similar_market} for the year 2013-2023:")
+                                        for year, value in data.items():
+                                            st.write(f"{year} : '{value}'")
+                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
-                            elif historical_or_forecast == "Forecast data":
-                                data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", "global", conn_str)
-                                if error:
-                                    st.write(error)
-                                else:
-                                    st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023-2033:")
-                                    for year, value in data.items():
-                                        st.write(f"{year} : '{value}'")
-                                    st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
-                        elif data_available_at_global_level:
-                            selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
-                            if selected_country:
-                                success_geography = process_market_size_data(selected_similar_market, selected_country, selected_data_type)
-                                if success_geography:
-                                    # Continue with historical_or_forecast radio button and answer retrieval
+                                elif historical_or_forecast == "Forecast data":
+                                    data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", "global", conn_str)
+                                    if error:
+                                        st.write(error)
+                                    else:
+                                        st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023-2033:")
+                                        for year, value in data.items():
+                                            st.write(f"{year} : '{value}'")
+                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                            elif data_available_at_global_level:
+                                selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
+                                if selected_country:
+                                    success_geography = process_market_size_data(selected_similar_market, selected_country, selected_data_type)
+                                    if success_geography:
+                                        # Continue with historical_or_forecast radio button and answer retrieval
        
-                                    historical_or_forecast = st.radio("Do you need historical data or forecasts?", ["Select option below","Historical data", "Forecast data"])
+                                        historical_or_forecast = st.radio("Do you need historical data or forecasts?", ["Select option below","Historical data", "Forecast data"])
                                 
-                                    if historical_or_forecast == "Historical data":
-                                        data, error = fetch_answer_from_database(selected_similar_market, "Historical data", selected_country, conn_str)
-                                        if error:
-                                            st.write(error)
-                                        else:
-                                            st.write(f"Here's the historical data of {selected_similar_market} for the year 2013 - 2023:")
-                                            for year, value in data.items():
-                                                st.write(f"{year} : '{value}'")
-                                            st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                        if historical_or_forecast == "Historical data":
+                                            data, error = fetch_answer_from_database(selected_similar_market, "Historical data", selected_country, conn_str)
+                                            if error:
+                                                st.write(error)
+                                            else:
+                                                st.write(f"Here's the historical data of {selected_similar_market} for the year 2013 - 2023:")
+                                                for year, value in data.items():
+                                                    st.write(f"{year} : '{value}'")
+                                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
-                                    elif historical_or_forecast == "Forecast data":
-                                        data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", selected_country, conn_str)
-                                        if error:
-                                            st.write(error)
-                                        else:
-                                            st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023 - 2033:")
-                                            for year, value in data.items():
-                                                st.write(f"{year} : '{value}'")
-                                            st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                        elif historical_or_forecast == "Forecast data":
+                                            data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", selected_country, conn_str)
+                                            if error:
+                                                st.write(error)
+                                            else:
+                                                st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023 - 2033:")
+                                                for year, value in data.items():
+                                                    st.write(f"{year} : '{value}'")
+                                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
 
 
@@ -356,7 +362,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
 
 def main():
     st.set_page_config("Question Answering App", layout="wide")
-    st.title("Question Answering App")
+    st.title("Question Answering")
     st.subheader("Hello! How can I assist you today? Please specify which market you are seeking information on? You can type the market name or browse from a list.")
 
     if 'market' not in st.session_state:
@@ -391,7 +397,7 @@ def main():
                     if row and row[0]:
                         rephrased_content = rephrase_with_langchain(row[0])
                         if rephrased_content:
-                            st.write(f"Rephrased content for {selected_data_type.lower()} for the {selected_market} market: fetching from market")
+                            st.write(f"Content for {selected_data_type.lower()} for the {selected_market} market:")
                             st.write(rephrased_content)
                             save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                         else:
