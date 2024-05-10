@@ -228,14 +228,28 @@ def handle_selected_market(selected_market):
                     # Try to fetch existing rephrased content from the database
                     rephrased_content = fetch_from_output(selected_similar_market, selected_data_type, conn_str)
                     if rephrased_content:
-                        st.write(f"Content for {selected_data_type.lower()} for the {selected_similar_market} market:")
+                        if selected_data_type == "Market Trends":
+                            st.write(f"Key trends in the {selected_similar_market} market are:")
+                        if selected_data_type == "Market Drivers":
+                            st.write(f"Key drivers in the {selected_similar_market} market are:")
+                        if selected_data_type == "Market Restraints":
+                            st.write(f"Key restraints in the {selected_similar_market} market are:")
+                        if selected_data_type == "Competitive Landscape":
+                            st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                         st.write(rephrased_content)
                     else:
                         row = check_data_availability(selected_similar_market, selected_data_type, conn_str)
                         if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
                             rephrased_content = rephrase_with_langchain(row[0])
                             if rephrased_content:
-                                st.write(f"Content for {selected_data_type.lower()} for the {selected_similar_market} market:")
+                                if selected_data_type == "Market Trends":
+                                    st.write(f"Key trends in the {selected_similar_market} market are:")
+                                if selected_data_type == "Market Drivers":
+                                    st.write(f"Key drivers in the {selected_similar_market} market are:")
+                                if selected_data_type == "Market Restraints":
+                                    st.write(f"Key restraints in the {selected_similar_market} market are:")
+                                if selected_data_type == "Competitive Landscape":
+                                    st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                                 st.write(rephrased_content)
                                 save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
                             else:
@@ -394,6 +408,10 @@ def main():
                 if rephrased_content:
                     if selected_data_type == "Market Trends":
                         st.write(f"Key trends in the {selected_market} market are:")
+                    if selected_data_type == "Market Drivers":
+                        st.write(f"Key drivers in the {selected_market} market are:")
+                    if selected_data_type == "Market Restraints":
+                        st.write(f"Key restraints in the {selected_market} market are:")
                     if selected_data_type == "Competitive Landscape":
                         st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                     st.write(rephrased_content)
@@ -402,7 +420,14 @@ def main():
                     if row and row[0]:
                         rephrased_content = rephrase_with_langchain(row[0])
                         if rephrased_content:
-                            st.write(f"Content for {selected_data_type.lower()} for the {selected_market} market:")
+                            if selected_data_type == "Market Trends":
+                                st.write(f"Key trends in the {selected_market} market are:")
+                            if selected_data_type == "Market Drivers":
+                                st.write(f"Key drivers in the {selected_market} market are:")
+                            if selected_data_type == "Market Restraints":
+                                st.write(f"Key restraints in the {selected_market} market are:")
+                            if selected_data_type == "Competitive Landscape":
+                                st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                             st.write(rephrased_content)
                             save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                         else:
