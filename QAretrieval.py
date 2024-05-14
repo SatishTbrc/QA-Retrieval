@@ -468,6 +468,10 @@ def main():
     if st.button("New chat"):
         # If the button is clicked, refresh the page
         st.experimental_rerun()
+        # Reset the session state variables
+        st.session_state.market = ""
+        st.session_state.data_type = ""
+        st.session_state.country = ""
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
