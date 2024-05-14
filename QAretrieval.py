@@ -464,6 +464,10 @@ def main():
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
     st.write("Helping you find market information")
+    # Add a "New chat" button
+    if st.button("New chat"):
+        # If the button is clicked, refresh the page
+        st.experimental_rerun()
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
