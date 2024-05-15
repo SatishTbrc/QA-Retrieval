@@ -464,14 +464,6 @@ def main():
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
     st.write("Helping you find market information")
-    # Add a "New chat" button
-    if st.button("New chat"):
-        # If the button is clicked, refresh the page
-        st.experimental_rerun()
-        # Reset the session state variables
-        st.session_state.market = ""
-        st.session_state.data_type = ""
-        st.session_state.country = ""
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
@@ -509,6 +501,13 @@ def main():
                     if selected_data_type == "Competitive Landscape":
                         st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                     st.write(rephrased_content)
+                    # Add a text input box for a new market
+                    new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
+                    if new_market:
+                        # Reset session state variables and start fresh conversation
+                        st.session_state.market = new_market
+                        st.session_state.data_type = ""
+                        st.session_state.country = ""
                 else:
                     row = check_data_availability(selected_market, selected_data_type, conn_str)
                     if row and row[0]:
