@@ -458,7 +458,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
     return False  # Indicate failure
 
 
-def main():
+def main(selected_market=""):
     st.set_page_config("Question Answering App", layout="wide")
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
@@ -476,14 +476,18 @@ def main():
     if 'country' not in st.session_state:  # Add this line to initialize the 'country' variable
         st.session_state.country = ""
 
+    if selected_market:
+        st.session_state.market = selected_market
+        st.session_state.data_type = ""
+        st.session_state.country = ""
+
     selected_market = st.text_input("", value = st.session_state.market)
 
     if selected_market:
         if st.session_state.market != selected_market:
-            # Reset session state variables if a new market is provided
-            st.session_state.market = selected_market
-            st.session_state.data_type = ""
-            st.session_state.country = ""
+            main(selected_market)  # Call main() again with the new market name
+            return
+
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
             selected_data_type = None
@@ -509,10 +513,8 @@ def main():
                     # Add a text input box for a new market
                     new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
                     if new_market:
-                        # Reset session state variables and start fresh conversation
-                        st.session_state.market = new_market
-                        st.session_state.data_type = ""
-                        st.session_state.country = ""
+                        main(new_market)  # Call main() again with the new market name
+                        return
                 else:
                     row = check_data_availability(selected_market, selected_data_type, conn_str)
                     if row and row[0]:
@@ -649,14 +651,8 @@ def main():
                                         st.table(data_df)
                                         st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
 
-                    
-                        
-                               
-                                
-
-                        
-                
-
 
 if __name__ == "__main__":
     main()
+
+
