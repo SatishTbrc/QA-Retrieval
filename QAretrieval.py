@@ -472,6 +472,8 @@ def main():
         st.session_state.market = ""
         st.session_state.data_type = ""
         st.session_state.country = ""
+        # Return to prevent executing the rest of the code
+        return
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
@@ -656,4 +658,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
