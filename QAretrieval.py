@@ -457,9 +457,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             
     return False  # Indicate failure
 
-
 def main(selected_market=""):
-    st.set_page_config("Question Answering App", layout="wide")
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
@@ -653,6 +651,7 @@ def main(selected_market=""):
 
 
 if __name__ == "__main__":
+    st.set_page_config("Question Answering App", layout="wide")
     main()
 
 
