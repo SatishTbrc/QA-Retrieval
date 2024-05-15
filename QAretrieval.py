@@ -478,9 +478,6 @@ def main(selected_market=""):
     selected_market = st.text_input("", value = st.session_state.market)
 
     if selected_market:
-        if st.session_state.market != selected_market:
-            main(selected_market)  # Call main() again with the new market name
-            return
 
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
