@@ -457,7 +457,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             
     return False  # Indicate failure
 
-def main(selected_market=""):
+def main():
     
     if 'market' not in st.session_state:
         st.session_state.market = ""
@@ -468,10 +468,6 @@ def main(selected_market=""):
     if 'country' not in st.session_state:  # Add this line to initialize the 'country' variable
         st.session_state.country = ""
 
-    if selected_market:
-        st.session_state.market = selected_market
-        st.session_state.data_type = ""
-        st.session_state.country = ""
 
     selected_market = st.text_input("", value = st.session_state.market)
 
@@ -505,8 +501,7 @@ def main(selected_market=""):
                     # Add a text input box for a new market
                     new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
                     if new_market:
-                        main(new_market)  # Call main() again with the new market name
-                        return
+                        selected_market = new_market
                 else:
                     row = check_data_availability(selected_market, selected_data_type, conn_str)
                     if row and row[0]:
