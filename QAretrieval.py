@@ -275,7 +275,7 @@ def handle_selected_market(selected_market):
                                 if error:
                                     st.write(error)
                                 else:
-                                    st.write(f"Here's the historical data of {selected_similar_market} for the year 2013-2023:")
+                                    st.write(f"Here's the historical data of {selected_similar_market} of Global for the year 2013-2023:")
                                     # Prepare data for display
                                     years = list(data.keys())  # Extract years
                                     values = list(data.values())  # Extract corresponding values
@@ -299,7 +299,7 @@ def handle_selected_market(selected_market):
                                 if error:
                                     st.write(error)
                                 else:
-                                    st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023-2033:")
+                                    st.write(f"Here's the forecast data of {selected_similar_market} of Global for the year 2023-2033:")
                                     # Prepare data for display
                                     years = list(data.keys())  # Extract years
                                     values = list(data.values())  # Extract corresponding values
@@ -331,7 +331,7 @@ def handle_selected_market(selected_market):
                                         if error:
                                             st.write(error)
                                         else:
-                                            st.write(f"Here's the historical data of {selected_similar_market} for the year 2013 - 2023:")
+                                            st.write(f"Here's the historical data of {selected_similar_market} of {selected_country} for the year 2013 - 2023:")
                                             # Prepare data for display
                                             years = list(data.keys())  # Extract years
                                             values = list(data.values())  # Extract corresponding values
@@ -355,7 +355,7 @@ def handle_selected_market(selected_market):
                                         if error:
                                             st.write(error)
                                         else:
-                                            st.write(f"Here's the forecast data of {selected_similar_market} for the year 2023 - 2033:")
+                                            st.write(f"Here's the forecast data of {selected_similar_market} of {selected_country} for the year 2023 - 2033:")
                                             # Prepare data for display
                                             years = list(data.keys())  # Extract years
                                             values = list(data.values())  # Extract corresponding values
@@ -408,7 +408,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the historical data of {selected_market} for the year 2013 - 2023:")
+                                st.write(f"Here's the historical data of {selected_market} of {selected_similar_geography} for the year 2013 - 2023:")
                                 # Prepare data for display
                                 years = list(data.keys())  # Extract years
                                 values = list(data.values())  # Extract corresponding values
@@ -432,7 +432,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
+                                st.write(f"Here's the forecast data of {selected_market} of {selected_similar_geography} for the year 2023-2033:")
                                 # Prepare data for display
                                 years = list(data.keys())  # Extract years
                                 values = list(data.values())  # Extract corresponding values
@@ -466,8 +466,8 @@ def main():
     st.write("Helping you find market information")
     # Add a "New chat" button
     if st.button("New chat"):
-        # If the button is clicked, refresh the page using JavaScript
-        st.write("<script>window.location.reload(true);</script>", unsafe_allow_html=True)
+        # If the button is clicked, refresh the page
+        st.experimental_rerun()
         # Reset the session state variables
         st.session_state.market = ""
         st.session_state.data_type = ""
@@ -548,7 +548,7 @@ def main():
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the historical data of {selected_market} for the year 2013-2023:")
+                                st.write(f"Here's the historical data of {selected_market} of Global for the year 2013-2023:")
                                 # Prepare data for display
                                 years = list(data.keys())  # Extract years
                                 values = list(data.values())  # Extract corresponding values
@@ -571,7 +571,7 @@ def main():
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
+                                st.write(f"Here's the forecast data of {selected_market} of Global for the year 2023-2033:")
                                 # Prepare data for display
                                 years = list(data.keys())  # Extract years
                                 values = list(data.values())  # Extract corresponding values
@@ -603,7 +603,7 @@ def main():
                                     if error:
                                         st.write(error)
                                     else:
-                                        st.write(f"Here's the historical data of {selected_market} for the year 2013-2023:")
+                                        st.write(f"Here's the historical data of {selected_market}  of {selected_country} for the year 2013-2023:")
                                         # Prepare data for display
                                         years = list(data.keys())  # Extract years
                                         values = list(data.values())  # Extract corresponding values
@@ -626,7 +626,7 @@ def main():
                                     if error:
                                         st.write(error)
                                     else:
-                                        st.write(f"Here's the forecast data of {selected_market} for the year 2023-2033:")
+                                        st.write(f"Here's the forecast data of {selected_market} of {selected_country} for the year 2023-2033:")
                                         # Prepare data for display
                                         years = list(data.keys())  # Extract years
                                         values = list(data.values())  # Extract corresponding values
