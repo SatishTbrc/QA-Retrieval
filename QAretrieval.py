@@ -466,14 +466,12 @@ def main():
     st.write("Helping you find market information")
     # Add a "New chat" button
     if st.button("New chat"):
-        # If the button is clicked, refresh the page
-        st.experimental_rerun()
+        # If the button is clicked, refresh the page using JavaScript
+        st.write("<script>window.location.reload(true);</script>", unsafe_allow_html=True)
         # Reset the session state variables
         st.session_state.market = ""
         st.session_state.data_type = ""
         st.session_state.country = ""
-        # Return to prevent executing the rest of the code
-        return
     st.markdown("<br>", unsafe_allow_html=True)
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
