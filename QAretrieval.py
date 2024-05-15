@@ -479,6 +479,11 @@ def main():
     selected_market = st.text_input("", value = st.session_state.market)
 
     if selected_market:
+        if st.session_state.market != selected_market:
+            # Reset session state variables if a new market is provided
+            st.session_state.market = selected_market
+            st.session_state.data_type = ""
+            st.session_state.country = ""
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
             selected_data_type = None
