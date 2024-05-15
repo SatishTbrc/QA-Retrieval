@@ -458,9 +458,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
     return False  # Indicate failure
 
 def main(selected_market=""):
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
-
+    
     if 'market' not in st.session_state:
         st.session_state.market = ""
 
@@ -478,6 +476,9 @@ def main(selected_market=""):
     selected_market = st.text_input("", value = st.session_state.market)
 
     if selected_market:
+        # Clear session state related to the previous market
+        st.session_state.data_type = ""
+        st.session_state.country = ""
 
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
@@ -649,6 +650,8 @@ if __name__ == "__main__":
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
     st.write("Helping you find market information")
-    main()
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
+    main()
 
