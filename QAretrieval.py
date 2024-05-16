@@ -66,7 +66,32 @@ def fetch_from_output(selected_market, selected_data_type, conn_str):
                 rephrased_content = cursor.fetchone()[0]
                 return rephrased_content
     return None  # Return None if no data is found
-    
+
+import psycopg2
+
+def get_available_data_types(market, conn_str):
+    available_data_types = []
+    try:
+        conn = psycopg2.connect(conn_str)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT data_type 
+            FROM market_data 
+            WHERE market = %s 
+                AND ("Market Trends" IS NOT NULL 
+                    OR "Market Drivers" IS NOT NULL 
+                    OR "Market Restraints" IS NOT NULL 
+                    OR "Competitive Landscape" IS NOT NULL)
+            """, (market,))
+        available_data_types = [row[0] for row in cursor.fetchall()]
+    except (Exception, psycopg2.Error) as error:
+        print("Error fetching data types:", error)
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+    return available_data_types
+
 # Database functions
 def check_market_in_database(market_name, conn_str):
     query = """
@@ -479,50 +504,52 @@ def main():
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
             selected_data_type = None
+            # Check available data types for the selected market
+            available_data_types = get_available_data_types(selected_market, conn_str)
+            if available_data_types:
+                data_type_options = ["Market Size"] + available_data_types
+                selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
+                if selected_data_type != "Select Option Below":
+                    st.session_state.data_type = selected_data_type
 
-            data_type_options = ["Market Size", "Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]
-            selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
-            if selected_data_type != "Select Option Below":
-                st.session_state.data_type = selected_data_type
-
-            if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
-                # Try to fetch existing rephrased content from the database
-                rephrased_content = fetch_from_output(selected_market, selected_data_type, conn_str)
-                if rephrased_content:
-                    if selected_data_type == "Market Trends":
-                        st.write(f"Key trends in the {selected_market} market are:")
-                    if selected_data_type == "Market Drivers":
-                        st.write(f"Key drivers in the {selected_market} market are:")
-                    if selected_data_type == "Market Restraints":
-                        st.write(f"Key restraints in the {selected_market} market are:")
-                    if selected_data_type == "Competitive Landscape":
-                        st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
-                    st.write(rephrased_content)
-                    # Add a text input box for a new market
-                    new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
-                    if new_market:
-                        selected_market = new_market
-                else:
-                    row = check_data_availability(selected_market, selected_data_type, conn_str)
-                    if row and row[0]:
-                        rephrased_content = rephrase_with_langchain(row[0])
-                        if rephrased_content:
-                            if selected_data_type == "Market Trends":
-                                st.write(f"Key trends in the {selected_market} market are:")
-                            if selected_data_type == "Market Drivers":
-                                st.write(f"Key drivers in the {selected_market} market are:")
-                            if selected_data_type == "Market Restraints":
-                                st.write(f"Key restraints in the {selected_market} market are:")
-                            if selected_data_type == "Competitive Landscape":
-                                st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
-                            st.write(rephrased_content)
-                            save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
-                        else:
-                            st.write("Unable to rephrase the content at this time.")
+                if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
+                    # Try to fetch existing rephrased content from the database
+                    rephrased_content = fetch_from_output(selected_market, selected_data_type, conn_str)
+                    if rephrased_content:
+                        if selected_data_type == "Market Trends":
+                            st.write(f"Key trends in the {selected_market} market are:")
+                        if selected_data_type == "Market Drivers":
+                            st.write(f"Key drivers in the {selected_market} market are:")
+                        if selected_data_type == "Market Restraints":
+                            st.write(f"Key restraints in the {selected_market} market are:")
+                        if selected_data_type == "Competitive Landscape":
+                            st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
+                        st.write(rephrased_content)
+                        # Add a text input box for a new market
+                        new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
+                        if new_market:
+                            selected_market = new_market
                     else:
-                        st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
-                        st.write("Let's proceed with the Market Size data.")
-                        selected_data_type = "Market Size"
+                        row = check_data_availability(selected_market, selected_data_type, conn_str)
+                        if row and row[0]:
+                            rephrased_content = rephrase_with_langchain(row[0])
+                            if rephrased_content:
+                                if selected_data_type == "Market Trends":
+                                    st.write(f"Key trends in the {selected_market} market are:")
+                                if selected_data_type == "Market Drivers":
+                                    st.write(f"Key drivers in the {selected_market} market are:")
+                                if selected_data_type == "Market Restraints":
+                                    st.write(f"Key restraints in the {selected_market} market are:")
+                                if selected_data_type == "Competitive Landscape":
+                                    st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
+                                st.write(rephrased_content)
+                                save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
+                            else:
+                                st.write("Unable to rephrase the content at this time.")
+                        else:
+                            st.write(f"Unfortunately, we don’t have the {selected_data_type.lower()} available for this market on the Global Market Model, but we cover the historic and forecast market size.")
+                            st.write("Let's proceed with the Market Size data.")
+                            selected_data_type = "Market Size"
 
 
             if selected_data_type == "Market Size":
