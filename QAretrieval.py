@@ -733,6 +733,7 @@ def main():
 
 
 if __name__ == "__main__":
+    st.set_page_config("Question Answering App", layout="wide")
     hide_st_style = """
             <style>
             MainMenu {visibility: hidden;}
@@ -741,7 +742,6 @@ if __name__ == "__main__":
             </style>
         """
     st.markdown(hide_st_style, unsafe_allow_html=True)
-    st.set_page_config("Question Answering App", layout="wide")
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
     st.title("Global Market Model AI-bot")
