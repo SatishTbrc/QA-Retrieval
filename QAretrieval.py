@@ -280,7 +280,7 @@ def handle_selected_market(selected_market):
             if success_selected_market:
                 selected_data_type = None
                 # Check available data types for the selected market
-                available_data_types = get_available_data_types(selected_market, conn_str)
+                available_data_types = get_available_data_types(selected_similar_market, conn_str)
             
                 data_type_options = ["Market Size"] + available_data_types
                 selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
