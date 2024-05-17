@@ -67,7 +67,22 @@ def fetch_from_output(selected_market, selected_data_type, conn_str):
                 return rephrased_content
     return None  # Return None if no data is found
 
-import psycopg2
+def get_hyperlink(selected_market, conn_str):
+    query = """
+        SELECT "Hyperlink" from public.market_data WHERE LOWER(segment) = LOWER(%s)
+    """
+
+    hyperlink = None
+    try:
+        with psycopg2.connect(conn_str) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (selected_market,))
+                row = cursor.fetchone()
+                if row:
+                    hyperlink = row[0]
+    except (Exception, psycopg2.Error) as error:
+        print("Error fetching hyperlink:", error)
+    return hyperlink
 
 def get_available_data_types(market, conn_str):
     available_data_types = []
@@ -75,15 +90,25 @@ def get_available_data_types(market, conn_str):
         conn = psycopg2.connect(conn_str)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT DISTINCT data_type 
-            FROM market_data 
-            WHERE market = %s 
-                AND ("Market Trends" IS NOT NULL 
+            SELECT 
+                CASE WHEN "Market Trends" IS NOT NULL THEN 'Market Trends' ELSE NULL END AS "Market Trends",
+                CASE WHEN "Market Drivers" IS NOT NULL THEN 'Market Drivers' ELSE NULL END AS "Market Drivers",
+                CASE WHEN "Market Restraints" IS NOT NULL THEN 'Market Restraints' ELSE NULL END AS "Market Restraints",
+                CASE WHEN "Competitive Landscape" IS NOT NULL THEN 'Competitive Landscape' ELSE NULL END AS "Competitive Landscape"
+            FROM 
+                public.market_data 
+            WHERE 
+                LOWER(segment) = LOWER(%s)
+                AND (
+                    "Market Trends" IS NOT NULL 
                     OR "Market Drivers" IS NOT NULL 
                     OR "Market Restraints" IS NOT NULL 
-                    OR "Competitive Landscape" IS NOT NULL)
+                    OR "Competitive Landscape" IS NOT NULL
+                );
             """, (market,))
-        available_data_types = [row[0] for row in cursor.fetchall()]
+        row = cursor.fetchone()
+        if row:
+            available_data_types = [col for col in row if col is not None]
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data types:", error)
     finally:
@@ -217,9 +242,20 @@ def fetch_answer_from_database(selected_market, data_type, selected_country, con
             cursor.execute(query, (selected_market, selected_country))
             row = cursor.fetchone()
             if row:
-                # Here we format each value to two decimal places directly
-                formatted_data = {year: "{:.2f}".format(float(value)) if value is not None else None for year, value in zip(years[data_type], row)}
-                return formatted_data, None
+                # Fetching row values from the database and formatting them to two decimal places
+                formatted_values = ["{:.2f}".format(float(value)) if value is not None else None for value in row]
+                
+                # Constructing the row values
+                row_values = [selected_country, selected_market, "Sales", "Fixed USD", "Billion"] + formatted_values
+                
+                # Constructing the headers
+                headers = ["Geography", "Segment", "Type", "Value", "Units"] + years[data_type]
+                
+                # Transposing the table
+                data = [headers, row_values]
+                
+                # Return the transposed table
+                return data, None
             else:
                 return None, "No data available"
 
@@ -243,8 +279,10 @@ def handle_selected_market(selected_market):
             success_selected_market = handle_selected_market(selected_similar_market)
             if success_selected_market:
                 selected_data_type = None
-
-                data_type_options = ["Market Size", "Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]
+                # Check available data types for the selected market
+                available_data_types = get_available_data_types(selected_market, conn_str)
+            
+                data_type_options = ["Market Size"] + available_data_types
                 selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
                 if selected_data_type != "Select Option Below":
                     st.session_state.data_type = selected_data_type
@@ -262,6 +300,17 @@ def handle_selected_market(selected_market):
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                         st.write(rephrased_content)
+                        further_assistance = st.text_input("Do you need further assistance?")
+                        further_datatype = "select option below"
+                        if further_assistance:
+                            # Clear session state variables
+                            st.session_state.market = further_assistance
+                            if 'data_type' not in st.session_state:
+                                st.session_state.data_type = ""
+                            st.session_state.country = ""
+
+                            # Rerun the app
+                            st.experimental_rerun()
                     else:
                         row = check_data_availability(selected_similar_market, selected_data_type, conn_str)
                         if row and row[0]:  # Checks that row is not None and row[0] is not an empty string or other falsy value
@@ -277,6 +326,17 @@ def handle_selected_market(selected_market):
                                     st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                                 st.write(rephrased_content)
                                 save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
+
+                                    # Rerun the app
+                                    st.experimental_rerun()
                             else:
                                 st.write("Unable to rephrase the content at this time.")
                         else:
@@ -301,23 +361,22 @@ def handle_selected_market(selected_market):
                                     st.write(error)
                                 else:
                                     st.write(f"Here's the historical data of {selected_similar_market} of Global for the year 2013-2023:")
-                                    # Prepare data for display
-                                    years = list(data.keys())  # Extract years
-                                    values = list(data.values())  # Extract corresponding values
-                                    currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                    df = pd.DataFrame(data[1:], columns=data[0])
+                                    df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                    st.dataframe(df)
+                                    hyperlink = get_hyperlink(selected_market, conn_str)
+                                    st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                    further_assistance = st.text_input("Do you need further assistance?")
+                                    further_datatype = "select option below"
+                                    if further_assistance:
+                                        # Clear session state variables
+                                        st.session_state.market = further_assistance
+                                        if 'data_type' not in st.session_state:
+                                            st.session_state.data_type = ""
+                                        st.session_state.country = ""
 
-                                    # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                    data_df = pd.DataFrame({
-                                        'Year': years,
-                                        'Value': values,
-                                        'Currency': currency
-                                    }).T  # Transpose to switch rows and columns
-
-                                    # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                    data_df.columns = range(1, len(years) + 1)
-
-                                    st.table(data_df)
-                                    st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                        # Rerun the app
+                                        st.experimental_rerun()
 
                             elif historical_or_forecast == "Forecast data":
                                 data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", "global", conn_str)
@@ -325,23 +384,22 @@ def handle_selected_market(selected_market):
                                     st.write(error)
                                 else:
                                     st.write(f"Here's the forecast data of {selected_similar_market} of Global for the year 2023-2033:")
-                                    # Prepare data for display
-                                    years = list(data.keys())  # Extract years
-                                    values = list(data.values())  # Extract corresponding values
-                                    currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                    df = pd.DataFrame(data[1:], columns=data[0])
+                                    df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                    st.dataframe(df)
+                                    hyperlink = get_hyperlink(selected_market, conn_str)
+                                    st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                    further_assistance = st.text_input("Do you need further assistance?")
+                                    further_datatype = "select option below"
+                                    if further_assistance:
+                                        # Clear session state variables
+                                        st.session_state.market = further_assistance
+                                        if 'data_type' not in st.session_state:
+                                            st.session_state.data_type = ""
+                                        st.session_state.country = ""
 
-                                    # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                    data_df = pd.DataFrame({
-                                        'Year': years,
-                                        'Value': values,
-                                        'Currency': currency
-                                    }).T  # Transpose to switch rows and columns
-
-                                    # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                    data_df.columns = range(1, len(years) + 1)
-
-                                    st.table(data_df)
-                                    st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                        # Rerun the app
+                                        st.experimental_rerun()
                         elif data_available_at_global_level:
                             selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
                             if selected_country:
@@ -357,23 +415,22 @@ def handle_selected_market(selected_market):
                                             st.write(error)
                                         else:
                                             st.write(f"Here's the historical data of {selected_similar_market} of {selected_country} for the year 2013 - 2023:")
-                                            # Prepare data for display
-                                            years = list(data.keys())  # Extract years
-                                            values = list(data.values())  # Extract corresponding values
-                                            currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                            df = pd.DataFrame(data[1:], columns=data[0])
+                                            df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                            st.dataframe(df)
+                                            hyperlink = get_hyperlink(selected_market, conn_str)
+                                            st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                            further_assistance = st.text_input("Do you need further assistance?")
+                                            further_datatype = "select option below"
+                                            if further_assistance:
+                                                # Clear session state variables
+                                                st.session_state.market = further_assistance
+                                                if 'data_type' not in st.session_state:
+                                                    st.session_state.data_type = ""
+                                                st.session_state.country = ""
 
-                                            # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                            data_df = pd.DataFrame({
-                                            'Year': years,
-                                            'Value': values,
-                                            'Currency': currency
-                                            }).T  # Transpose to switch rows and columns
-
-                                            # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                            data_df.columns = range(1, len(years) + 1)
-
-                                            st.table(data_df)
-                                            st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                                # Rerun the app
+                                                st.experimental_rerun()
 
                                     elif historical_or_forecast == "Forecast data":
                                         data, error = fetch_answer_from_database(selected_similar_market, "Forecast data", selected_country, conn_str)
@@ -381,23 +438,22 @@ def handle_selected_market(selected_market):
                                             st.write(error)
                                         else:
                                             st.write(f"Here's the forecast data of {selected_similar_market} of {selected_country} for the year 2023 - 2033:")
-                                            # Prepare data for display
-                                            years = list(data.keys())  # Extract years
-                                            values = list(data.values())  # Extract corresponding values
-                                            currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                            df = pd.DataFrame(data[1:], columns=data[0])
+                                            df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                            st.dataframe(df)
+                                            hyperlink = get_hyperlink(selected_market, conn_str)
+                                            st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                            further_assistance = st.text_input("Do you need further assistance?")
+                                            further_datatype = "select option below"
+                                            if further_assistance:
+                                                # Clear session state variables
+                                                st.session_state.market = further_assistance
+                                                if 'data_type' not in st.session_state:
+                                                    st.session_state.data_type = ""
+                                                st.session_state.country = ""
 
-                                            # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                            data_df = pd.DataFrame({
-                                                'Year': years,
-                                                'Value': values,
-                                                'Currency': currency
-                                            }).T  # Transpose to switch rows and columns
-
-                                            # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                            data_df.columns = range(1, len(years) + 1)
-
-                                            st.table(data_df)
-                                            st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                                # Rerun the app
+                                                st.experimental_rerun()
 
 
 
@@ -434,23 +490,22 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(error)
                             else:
                                 st.write(f"Here's the historical data of {selected_market} of {selected_similar_geography} for the year 2013 - 2023:")
-                                # Prepare data for display
-                                years = list(data.keys())  # Extract years
-                                values = list(data.values())  # Extract corresponding values
-                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                df = pd.DataFrame(data[1:], columns=data[0])
+                                df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                st.dataframe(df)
+                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
 
-                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                data_df = pd.DataFrame({
-                                    'Year': years,
-                                    'Value': values,
-                                    'Currency': currency
-                                }).T  # Transpose to switch rows and columns
-
-                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                data_df.columns = range(1, len(years) + 1)
-
-                                st.table(data_df)
-                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                    # Rerun the app
+                                    st.experimental_rerun()
 
                         elif historical_or_forecast == "Forecast data":
                             data, error = fetch_answer_from_database(selected_market, "Forecast data", selected_similar_geography, conn_str)
@@ -458,23 +513,22 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(error)
                             else:
                                 st.write(f"Here's the forecast data of {selected_market} of {selected_similar_geography} for the year 2023-2033:")
-                                # Prepare data for display
-                                years = list(data.keys())  # Extract years
-                                values = list(data.values())  # Extract corresponding values
-                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                df = pd.DataFrame(data[1:], columns=data[0])
+                                df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                st.dataframe(df)
+                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
 
-                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                data_df = pd.DataFrame({
-                                    'Year': years,
-                                    'Value': values,
-                                    'Currency': currency
-                                }).T  # Transpose to switch rows and columns
-
-                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                data_df.columns = range(1, len(years) + 1)
-
-                                st.table(data_df)
-                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                    # Rerun the app
+                                    st.experimental_rerun()
             else:
                 st.error("Please enter a valid geography.")
                 return False
@@ -497,20 +551,18 @@ def main():
     selected_market = st.text_input("", value = st.session_state.market)
 
     if selected_market:
-        # Clear session state related to the previous market
-        st.session_state.data_type = ""
-        st.session_state.country = ""
+        
 
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
             selected_data_type = None
             # Check available data types for the selected market
             available_data_types = get_available_data_types(selected_market, conn_str)
-            if available_data_types:
-                data_type_options = ["Market Size"] + available_data_types
-                selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
-                if selected_data_type != "Select Option Below":
-                    st.session_state.data_type = selected_data_type
+            
+            data_type_options = ["Market Size"] + available_data_types
+            selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
+            if selected_data_type != "Select Option Below":
+                st.session_state.data_type = selected_data_type
 
                 if selected_data_type in ["Market Trends", "Market Drivers", "Market Restraints", "Competitive Landscape"]:
                     # Try to fetch existing rephrased content from the database
@@ -525,10 +577,17 @@ def main():
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                         st.write(rephrased_content)
-                        # Add a text input box for a new market
-                        new_market = st.text_input("Enter a new market name to start a fresh conversation", value="")
-                        if new_market:
-                            selected_market = new_market
+                        further_assistance = st.text_input("Do you need further assistance?")
+                        further_datatype = "select option below"
+                        if further_assistance:
+                            # Clear session state variables
+                            st.session_state.market = further_assistance
+                            if 'data_type' not in st.session_state:
+                                st.session_state.data_type = ""
+                            st.session_state.country = ""
+
+                            # Rerun the app
+                            st.experimental_rerun()
                     else:
                         row = check_data_availability(selected_market, selected_data_type, conn_str)
                         if row and row[0]:
@@ -544,6 +603,17 @@ def main():
                                     st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                                 st.write(rephrased_content)
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
+
+                                    # Rerun the app
+                                    st.experimental_rerun()
                             else:
                                 st.write("Unable to rephrase the content at this time.")
                         else:
@@ -569,46 +639,44 @@ def main():
                                 st.write(error)
                             else:
                                 st.write(f"Here's the historical data of {selected_market} of Global for the year 2013-2023:")
-                                # Prepare data for display
-                                years = list(data.keys())  # Extract years
-                                values = list(data.values())  # Extract corresponding values
-                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                df = pd.DataFrame(data[1:], columns=data[0])
+                                df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                st.dataframe(df)
+                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
 
-                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                data_df = pd.DataFrame({
-                                    'Year': years,
-                                    'Value': values,
-                                    'Currency': currency
-                                }).T  # Transpose to switch rows and columns
-
-                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                data_df.columns = range(1, len(years) + 1)
-
-                                st.table(data_df)
-                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                    # Rerun the app
+                                    st.experimental_rerun()
                         elif historical_or_forecast == "Forecast data":
                             data, error = fetch_answer_from_database(selected_market, "Forecast data", "global", conn_str)
                             if error:
                                 st.write(error)
                             else:
                                 st.write(f"Here's the forecast data of {selected_market} of Global for the year 2023-2033:")
-                                # Prepare data for display
-                                years = list(data.keys())  # Extract years
-                                values = list(data.values())  # Extract corresponding values
-                                currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                df = pd.DataFrame(data[1:], columns=data[0])
+                                df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                st.dataframe(df)
+                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_datatype = "select option below"
+                                if further_assistance:
+                                    # Clear session state variables
+                                    st.session_state.market = further_assistance
+                                    if 'data_type' not in st.session_state:
+                                        st.session_state.data_type = ""
+                                    st.session_state.country = ""
 
-                                # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                data_df = pd.DataFrame({
-                                    'Year': years,
-                                    'Value': values,
-                                    'Currency': currency
-                                }).T  # Transpose to switch rows and columns
-
-                                # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                data_df.columns = range(1, len(years) + 1)
-
-                                st.table(data_df)
-                                st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                    # Rerun the app
+                                    st.experimental_rerun()
                     elif data_available_at_global_level:
                         selected_country = st.text_input("Which geography are you interested in? Please specify a country or region:", value=st.session_state.country)  # Use st.session_state.country as the default value
                         if selected_country:
@@ -624,49 +692,55 @@ def main():
                                         st.write(error)
                                     else:
                                         st.write(f"Here's the historical data of {selected_market}  of {selected_country} for the year 2013-2023:")
-                                        # Prepare data for display
-                                        years = list(data.keys())  # Extract years
-                                        values = list(data.values())  # Extract corresponding values
-                                        currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                        df = pd.DataFrame(data[1:], columns=data[0])
+                                        df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                        st.dataframe(df)
+                                        hyperlink = get_hyperlink(selected_market, conn_str)
+                                        st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                        further_assistance = st.text_input("Do you need further assistance?")
+                                        further_datatype = "select option below"
+                                        if further_assistance:
+                                            # Clear session state variables
+                                            st.session_state.market = further_assistance
+                                            if 'data_type' not in st.session_state:
+                                                st.session_state.data_type = ""
+                                            st.session_state.country = ""
 
-                                        # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                        data_df = pd.DataFrame({
-                                            'Year': years,
-                                            'Value': values,
-                                            'Currency': currency
-                                        }).T  # Transpose to switch rows and columns
-
-                                        # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                        data_df.columns = range(1, len(years) + 1)
-
-                                        st.table(data_df)
-                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                            # Rerun the app
+                                            st.experimental_rerun()
                                 elif historical_or_forecast == "Forecast data":
                                     data, error = fetch_answer_from_database(selected_market, "Forecast data", selected_country, conn_str)
                                     if error:
                                         st.write(error)
                                     else:
                                         st.write(f"Here's the forecast data of {selected_market} of {selected_country} for the year 2023-2033:")
-                                        # Prepare data for display
-                                        years = list(data.keys())  # Extract years
-                                        values = list(data.values())  # Extract corresponding values
-                                        currency = ['USD Billions'] * len(years)  # Repeat 'USD Billions' for each year
+                                        df = pd.DataFrame(data[1:], columns=data[0])
+                                        df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
+                                        st.dataframe(df)
+                                        hyperlink = get_hyperlink(selected_market, conn_str)
+                                        st.write(f"If you need further details or comparisons:  {hyperlink}")
+                                        further_assistance = st.text_input("Do you need further assistance?")
+                                        further_datatype = "select option below"
+                                        if further_assistance:
+                                            # Clear session state variables
+                                            st.session_state.market = further_assistance
+                                            if 'data_type' not in st.session_state:
+                                                st.session_state.data_type = ""
+                                            st.session_state.country = ""
 
-                                        # Create a DataFrame with 'Year', 'Value', and 'Currency' as rows
-                                        data_df = pd.DataFrame({
-                                            'Year': years,
-                                            'Value': values,
-                                            'Currency': currency
-                                        }).T  # Transpose to switch rows and columns
-
-                                        # Rename the columns to use sequential numbers, which will not show in display, for cleaner output
-                                        data_df.columns = range(1, len(years) + 1)
-
-                                        st.table(data_df)
-                                        st.write(f"'If you need further details or comparisons: ' https://globalmarketmodel.com/Markettool.aspx")
+                                            # Rerun the app
+                                            st.experimental_rerun()
 
 
 if __name__ == "__main__":
+    hide_st_style = """
+            <style>
+            MainMenu {visibility: hidden;}
+            header {visibility: hidden;}
+            footer {visibility: hidden;}
+            </style>
+        """
+    st.markdown(hide_st_style, unsafe_allow_html=True)
     st.set_page_config("Question Answering App", layout="wide")
     logo_path = "logo-TBRC.png"
     st.image(logo_path, width=200)
