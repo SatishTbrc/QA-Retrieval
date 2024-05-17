@@ -300,7 +300,7 @@ def handle_selected_market(selected_market):
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                         st.write(rephrased_content)
-                        further_assistance = st.text_input("Do you need further assistance?")
+                        further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
                         if further_assistance:
                             # Clear session state variables
@@ -326,7 +326,7 @@ def handle_selected_market(selected_market):
                                     st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                                 st.write(rephrased_content)
                                 save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -364,9 +364,9 @@ def handle_selected_market(selected_market):
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
-                                    hyperlink = get_hyperlink(selected_market, conn_str)
+                                    hyperlink = get_hyperlink(selected_similar_market, conn_str)
                                     st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                    further_assistance = st.text_input("Do you need further assistance?")
+                                    further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                     further_datatype = "select option below"
                                     if further_assistance:
                                         # Clear session state variables
@@ -387,9 +387,9 @@ def handle_selected_market(selected_market):
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
-                                    hyperlink = get_hyperlink(selected_market, conn_str)
+                                    hyperlink = get_hyperlink(selected_similar_market, conn_str)
                                     st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                    further_assistance = st.text_input("Do you need further assistance?")
+                                    further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                     further_datatype = "select option below"
                                     if further_assistance:
                                         # Clear session state variables
@@ -418,9 +418,9 @@ def handle_selected_market(selected_market):
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
-                                            hyperlink = get_hyperlink(selected_market, conn_str)
+                                            hyperlink = get_hyperlink(selected_similar_market, conn_str)
                                             st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                            further_assistance = st.text_input("Do you need further assistance?")
+                                            further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                             further_datatype = "select option below"
                                             if further_assistance:
                                                 # Clear session state variables
@@ -441,9 +441,9 @@ def handle_selected_market(selected_market):
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
-                                            hyperlink = get_hyperlink(selected_market, conn_str)
+                                            hyperlink = get_hyperlink(selected_similar_market, conn_str)
                                             st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                            further_assistance = st.text_input("Do you need further assistance?")
+                                            further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                             further_datatype = "select option below"
                                             if further_assistance:
                                                 # Clear session state variables
@@ -495,7 +495,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.dataframe(df)
                                 hyperlink = get_hyperlink(selected_market, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -518,7 +518,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.dataframe(df)
                                 hyperlink = get_hyperlink(selected_market, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -577,7 +577,7 @@ def main():
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                         st.write(rephrased_content)
-                        further_assistance = st.text_input("Do you need further assistance?")
+                        further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
                         if further_assistance:
                             # Clear session state variables
@@ -603,7 +603,7 @@ def main():
                                     st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                                 st.write(rephrased_content)
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -644,7 +644,7 @@ def main():
                                 st.dataframe(df)
                                 hyperlink = get_hyperlink(selected_market, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -666,7 +666,7 @@ def main():
                                 st.dataframe(df)
                                 hyperlink = get_hyperlink(selected_market, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                further_assistance = st.text_input("Do you need further assistance?")
+                                further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
                                 if further_assistance:
                                     # Clear session state variables
@@ -697,7 +697,7 @@ def main():
                                         st.dataframe(df)
                                         hyperlink = get_hyperlink(selected_market, conn_str)
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                        further_assistance = st.text_input("Do you need further assistance?")
+                                        further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
                                         if further_assistance:
                                             # Clear session state variables
@@ -719,7 +719,7 @@ def main():
                                         st.dataframe(df)
                                         hyperlink = get_hyperlink(selected_market, conn_str)
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
-                                        further_assistance = st.text_input("Do you need further assistance?")
+                                        further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
                                         if further_assistance:
                                             # Clear session state variables
