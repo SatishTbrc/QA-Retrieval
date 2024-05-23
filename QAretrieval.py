@@ -182,7 +182,7 @@ def get_top_5_similar_markets_from_database(query, conn_str):
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query)
-                rows = cursor.fetchall(0)
+                rows = cursor.fetchall()
                 similar_markets.extend([row[0] for row in rows])
     return similar_markets
 
