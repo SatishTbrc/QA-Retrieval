@@ -182,7 +182,7 @@ def get_top_5_similar_markets_from_database(query, conn_str):
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
                 cursor.execute(query)
-                rows = cursor.fetchall()
+                rows = cursor.fetchmany(5)
                 similar_markets.extend([row[0] for row in rows])
     return similar_markets
 
@@ -267,16 +267,7 @@ def handle_selected_market(selected_market):
         return True
     else:
         st.write("Unfortunately, we don’t cover this market in the Global Market Model, but here are some similar markets you might be interested in:")
-        similar_markets_query = f"""
-            SELECT segment
-            FROM (
-                SELECT DISTINCT segment
-                FROM public.market_data
-                WHERE LOWER(segment) LIKE LOWER('%{selected_market}%')
-            ) AS distinct_segments
-            ORDER BY RANDOM()
-            LIMIT 5;
-            """
+        similar_markets_query = f"SELECT DISTINCT segment FROM public.market_data WHERE LOWER(segment) LIKE LOWER('%{selected_market}%')"
         similar_markets = get_top_5_similar_markets_from_database(similar_markets_query, conn_str)
         if not similar_markets:
             st.error("We don't have this market, please enter a valid market name.")
