@@ -267,7 +267,7 @@ def handle_selected_market(selected_market):
         return True
     else:
         st.write("Unfortunately, we don’t cover this market in the Global Market Model, but here are some similar markets you might be interested in:")
-        similar_markets_query = f"SELECT DISTINCT segment FROM public.market_data WHERE LOWER(segment) LIKE LOWER('%{selected_market}%')"
+        similar_markets_query = f"SELECT DISTINCT segment FROM public.market_data WHERE LOWER(segment) LIKE LOWER('%{selected_market}%') ORDER BY RANDOM()"
         similar_markets = get_top_5_similar_markets_from_database(similar_markets_query, conn_str)
         if not similar_markets:
             st.error("We don't have this market, please enter a valid market name.")
