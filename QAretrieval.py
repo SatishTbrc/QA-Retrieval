@@ -179,14 +179,9 @@ def check_region_data_availability(selected_market, selected_country, conn_str):
 def get_top_5_similar_markets_from_database(selected_market, conn_str):
     similar_markets = []
     query = """
-    SELECT segment 
-    FROM (
         SELECT DISTINCT segment 
         FROM public.market_data 
         WHERE LOWER(segment) LIKE LOWER('%{}%')
-    ) subquery 
-    ORDER BY RANDOM() 
-    LIMIT 5
     """.format(selected_market)
     
     try:
