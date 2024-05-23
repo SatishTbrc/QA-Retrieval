@@ -182,6 +182,7 @@ def get_top_5_similar_markets_from_database(selected_market, conn_str):
         SELECT DISTINCT segment 
         FROM public.market_data 
         WHERE LOWER(segment) LIKE LOWER('%{}%')
+        LIMIT 5
     """.format(selected_market)
     
     try:
