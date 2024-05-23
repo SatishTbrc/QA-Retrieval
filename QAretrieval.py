@@ -183,16 +183,16 @@ def get_top_5_similar_markets_from_database(selected_market, conn_str):
     FROM (
         SELECT DISTINCT segment 
         FROM public.market_data 
-        WHERE LOWER(segment) LIKE LOWER('%%s%')
+        WHERE LOWER(segment) LIKE LOWER('%{}%')
     ) subquery 
     ORDER BY RANDOM() 
     LIMIT 5
-    """
+    """.format(selected_market)
     
     try:
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query,(selected_market,))
+                cursor.execute(query)
                 rows = cursor.fetchall()
                 similar_markets.extend([row[0] for row in rows])
     except Exception as e:
