@@ -84,6 +84,23 @@ def get_hyperlink(selected_market, conn_str):
         print("Error fetching hyperlink:", error)
     return hyperlink
 
+def get_reportlink(selected_market, conn_str):
+    query = """
+        SELECT "Reportlink" from public.market_data WHERE LOWER(segment) = LOWER(%s)
+    """
+
+    hyperlink = None
+    try:
+        with psycopg2.connect(conn_str) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(query, (selected_market,))
+                row = cursor.fetchone()
+                if row:
+                    hyperlink = row[0]
+    except (Exception, psycopg2.Error) as error:
+        print("Error fetching hyperlink:", error)
+    return hyperlink
+
 def get_available_data_types(market, conn_str):
     available_data_types = []
     try:
@@ -310,6 +327,8 @@ def handle_selected_market(selected_market):
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                         st.write(rephrased_content)
+                        reportlink = get_reportlink(selected_similar_market, conn_str)
+                        st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
                         if further_assistance:
@@ -335,6 +354,8 @@ def handle_selected_market(selected_market):
                                 if selected_data_type == "Competitive Landscape":
                                     st.write(f"Key insights on the competitive landscape of the {selected_similar_market} market are:")
                                 st.write(rephrased_content)
+                                reportlink = get_reportlink(selected_similar_market, conn_str)
+                                st.write(f"If you need further details :  {reportlink}")
                                 save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
@@ -587,6 +608,8 @@ def main():
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                         st.write(rephrased_content)
+                        reportlink = get_reportlink(selected_market, conn_str)
+                        st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
                         if further_assistance:
@@ -612,6 +635,8 @@ def main():
                                 if selected_data_type == "Competitive Landscape":
                                     st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
                                 st.write(rephrased_content)
+                                reportlink = get_reportlink(selected_market, conn_str)
+                                st.write(f"If you need further details :  {reportlink}")
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
