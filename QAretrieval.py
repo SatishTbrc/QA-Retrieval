@@ -70,7 +70,7 @@ def fetch_from_output(selected_market, selected_data_type, conn_str):
 # Function to check if "Market Size" data is available in the database
 def is_market_size_available(selected_market, conn_str):
     query = f"""
-    SELECT 1 
+    SELECT geography 
     FROM market_data 
     WHERE segment = '{selected_market}' 
     AND geography IS NOT NULL
