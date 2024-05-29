@@ -67,6 +67,22 @@ def fetch_from_output(selected_market, selected_data_type, conn_str):
                 return rephrased_content
     return None  # Return None if no data is found
 
+# Function to check if "Market Size" data is available in the database
+def is_market_size_available(selected_market, conn_str):
+    query = f"""
+    SELECT 1 
+    FROM market_data 
+    WHERE segment = '{selected_market}' 
+    AND geography IS NOT NULL
+    """
+    try:
+        # Assuming you have a function `execute_query` to execute the query and return results
+        result = execute_query(query, conn_str)
+        return len(result) > 0
+    except Exception as e:
+        st.write(f"Error checking market size availability: {e}")
+        return False
+
 def get_hyperlink(selected_market, conn_str):
     query = """
         SELECT "Hyperlink" from public.market_data WHERE LOWER(segment) = LOWER(%s)
@@ -589,8 +605,11 @@ def main():
             selected_data_type = None
             # Check available data types for the selected market
             available_data_types = get_available_data_types(selected_market, conn_str)
-            
-            data_type_options = ["Market Size"] + available_data_types
+            # Check if "Market Size" data is available
+            if is_market_size_available(selected_market, conn_str):
+                data_type_options = ["Market Size"] + available_data_types
+            else:
+                data_type_options = available_data_types
             selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
             if selected_data_type != "Select Option Below":
                 st.session_state.data_type = selected_data_type
