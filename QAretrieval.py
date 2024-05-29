@@ -74,14 +74,25 @@ def is_market_size_available(selected_market, conn_str):
     FROM market_data 
     WHERE segment = '{selected_market}' 
     AND geography IS NOT NULL
+    LIMIT 1
     """
     try:
-        # Assuming you have a function `execute_query` to execute the query and return results
-        result = execute_query(query, conn_str)
+        # Assuming conn_str is a dictionary with connection parameters
+        conn = psycopg2.connect(**conn_str)
+        cursor = conn.cursor()
+        #print(f"Executing query: {query}")  # Debug: Print the query being executed
+        cursor.execute(query)
+        result = cursor.fetchall()
+        #print(f"Query result: {result}")  # Debug: Print the result of the query
+        conn.close()
         return len(result) > 0
-    except Exception as e:
-        st.write(f"Error checking market size availability: {e}")
+    except psycopg2.Error as e:
+        #print(f"Database error: {e}")
         return False
+    except Exception as e:
+        #print(f"Exception in query execution: {e}")
+        return False
+
 
 def get_hyperlink(selected_market, conn_str):
     query = """
@@ -605,11 +616,13 @@ def main():
             selected_data_type = None
             # Check available data types for the selected market
             available_data_types = get_available_data_types(selected_market, conn_str)
-            # Check if "Market Size" data is available
+            data_type_options = []
+
+            # Only add "Market Size" if it's available
             if is_market_size_available(selected_market, conn_str):
-                data_type_options = ["Market Size"] + available_data_types
-            else:
-                data_type_options = available_data_types
+                data_type_options.append("Market Size")
+
+            data_type_options += available_data_types
             selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
             if selected_data_type != "Select Option Below":
                 st.session_state.data_type = selected_data_type
