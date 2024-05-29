@@ -67,33 +67,33 @@ def fetch_from_output(selected_market, selected_data_type, conn_str):
                 return rephrased_content
     return None  # Return None if no data is found
 
-# Function to check if "Market Size" data is available in the database
-def is_market_size_available(selected_market, conn_str):
-    query = f"""
-    SELECT geography 
-    FROM market_data 
-    WHERE segment = '{selected_market}' 
-    AND geography IS NOT NULL
-    """
+def get_available_market_size(market, conn_str):
+    available_market_size = []
     try:
-        # Assuming conn_str is a dictionary with connection parameters
         conn = psycopg2.connect(conn_str)
         cursor = conn.cursor()
-        #print(f"Executing query: {query}")  # Debug: Print the query being executed
-        cursor.execute(query)
-        result = cursor.fetchone()
-        #print(f"Query result: {result}")  # Debug: Print the result of the query
-        conn.close()
-        if len(result) > 0:
-            return True
-        else:
-            return False
-    except psycopg2.Error as e:
-        #print(f"Database error: {e}")
-        return False
-    except Exception as e:
-        #print(f"Exception in query execution: {e}")
-        return False
+        cursor.execute("""
+            SELECT
+                CASE
+                    WHEN COUNT(DISTINCT geography) > 1 THEN TRUE
+                    WHEN COUNT(DISTINCT geography) = 1 AND MAX(geography) IS NOT NULL THEN TRUE
+                    ELSE FALSE
+                END
+            FROM
+                market_data
+            WHERE
+                segment = %s;
+            """, (market,))
+        row = cursor.fetchone()
+        if row:
+            available_data_types.append("Market Size")
+    except (Exception, psycopg2.Error) as error:
+        print("Error fetching data types:", error)
+    finally:
+        if conn:
+            cursor.close()
+            conn.close()
+    return available_market_size
 
 
 def get_hyperlink(selected_market, conn_str):
@@ -618,13 +618,14 @@ def main():
             selected_data_type = None
             # Check available data types for the selected market
             available_data_types = get_available_data_types(selected_market, conn_str)
-            data_type_options = []
+            available_market_size = get_available_market_size(selected_market, conn_str)
+            #data_type_options = []
 
             # Only add "Market Size" if it's available
-            if is_market_size_available(selected_market, conn_str):
-                data_type_options.append("Market Size")
+            #if is_market_size_available(selected_market, conn_str):
+                #data_type_options.append("Market Size")
 
-            data_type_options += available_data_types
+            data_type_options = available_market_size + available_data_types
             selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
             if selected_data_type != "Select Option Below":
                 st.session_state.data_type = selected_data_type
