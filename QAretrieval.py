@@ -96,16 +96,16 @@ def get_available_market_size(market, conn_str):
     return available_market_size
 
 
-def get_hyperlink(selected_market, conn_str):
+def get_hyperlink(selected_market, selected_country, conn_str):
     query = """
-        SELECT "Hyperlink" from public.market_data WHERE LOWER(segment) = LOWER(%s)
+        SELECT "Hyperlink" from public.market_data WHERE LOWER(segment) = LOWER(%s) AND LOWER(geography) = LOWER(%s)
     """
 
     hyperlink = None
     try:
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query, (selected_market,))
+                cursor.execute(query, (selected_market,selected_country))
                 row = cursor.fetchone()
                 if row:
                     hyperlink = row[0]
@@ -424,7 +424,7 @@ def handle_selected_market(selected_market):
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
-                                    hyperlink = get_hyperlink(selected_similar_market, conn_str)
+                                    hyperlink = get_hyperlink(selected_similar_market,'Global', conn_str)
                                     st.write(f"If you need further details or comparisons:  {hyperlink}")
                                     further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                     further_datatype = "select option below"
@@ -447,7 +447,7 @@ def handle_selected_market(selected_market):
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
-                                    hyperlink = get_hyperlink(selected_similar_market, conn_str)
+                                    hyperlink = get_hyperlink(selected_similar_market,'Global', conn_str)
                                     st.write(f"If you need further details or comparisons:  {hyperlink}")
                                     further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                     further_datatype = "select option below"
@@ -478,7 +478,7 @@ def handle_selected_market(selected_market):
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
-                                            hyperlink = get_hyperlink(selected_similar_market, conn_str)
+                                            hyperlink = get_hyperlink(selected_similar_market,selected_country, conn_str)
                                             st.write(f"If you need further details or comparisons:  {hyperlink}")
                                             further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                             further_datatype = "select option below"
@@ -501,7 +501,7 @@ def handle_selected_market(selected_market):
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
-                                            hyperlink = get_hyperlink(selected_similar_market, conn_str)
+                                            hyperlink = get_hyperlink(selected_similar_market,selected_country, conn_str)
                                             st.write(f"If you need further details or comparisons:  {hyperlink}")
                                             further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                             further_datatype = "select option below"
@@ -553,7 +553,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
-                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                hyperlink = get_hyperlink(selected_market,selected_similar_geography, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
@@ -576,7 +576,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
-                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                hyperlink = get_hyperlink(selected_market,selected_similar_geography, conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
@@ -712,7 +712,7 @@ def main():
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
-                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                hyperlink = get_hyperlink(selected_market,"global", conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
@@ -734,7 +734,7 @@ def main():
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
-                                hyperlink = get_hyperlink(selected_market, conn_str)
+                                hyperlink = get_hyperlink(selected_market,"global", conn_str)
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
@@ -765,7 +765,7 @@ def main():
                                         df = pd.DataFrame(data[1:], columns=data[0])
                                         df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                         st.dataframe(df)
-                                        hyperlink = get_hyperlink(selected_market, conn_str)
+                                        hyperlink = get_hyperlink(selected_market,selected_country, conn_str)
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
                                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
@@ -787,7 +787,7 @@ def main():
                                         df = pd.DataFrame(data[1:], columns=data[0])
                                         df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                         st.dataframe(df)
-                                        hyperlink = get_hyperlink(selected_market, conn_str)
+                                        hyperlink = get_hyperlink(selected_market,selected_country, conn_str)
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
                                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
