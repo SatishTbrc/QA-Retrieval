@@ -84,7 +84,7 @@ def is_market_size_available(selected_market, conn_str):
         result = cursor.fetchone()
         #print(f"Query result: {result}")  # Debug: Print the result of the query
         conn.close()
-        if return len(result) > 0:
+        if len(result) > 0:
             return True
         else:
             return False
