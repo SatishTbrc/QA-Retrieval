@@ -74,18 +74,20 @@ def is_market_size_available(selected_market, conn_str):
     FROM market_data 
     WHERE segment = '{selected_market}' 
     AND geography IS NOT NULL
-    LIMIT 1
     """
     try:
         # Assuming conn_str is a dictionary with connection parameters
-        conn = psycopg2.connect(**conn_str)
+        conn = psycopg2.connect(conn_str)
         cursor = conn.cursor()
         #print(f"Executing query: {query}")  # Debug: Print the query being executed
         cursor.execute(query)
-        result = cursor.fetchall()
+        result = cursor.fetchone()
         #print(f"Query result: {result}")  # Debug: Print the result of the query
         conn.close()
-        return len(result) > 0
+        if return len(result) > 0:
+            return True
+        else:
+            return False
     except psycopg2.Error as e:
         #print(f"Database error: {e}")
         return False
