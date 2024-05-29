@@ -86,7 +86,7 @@ def get_available_market_size(market, conn_str):
             """, (market,))
         row = cursor.fetchone()
         if row:
-            available_data_types.append("Market Size")
+            available_market_size.append("Market Size")
     except (Exception, psycopg2.Error) as error:
         print("Error fetching data types:", error)
     finally:
