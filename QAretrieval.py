@@ -228,21 +228,21 @@ def get_top_5_similar_markets_from_database(selected_market, conn_str):
         (
         SELECT DISTINCT segment 
         FROM public.market_data 
-        WHERE LOWER(segment) LIKE LOWER('{}%')
+        WHERE LOWER(segment) LIKE LOWER(%s)
         )
         UNION
         (
         SELECT DISTINCT segment 
         FROM public.market_data 
-        WHERE LOWER(segment) LIKE LOWER('%{}%') AND segment NOT LIKE LOWER('{}%')
+        WHERE LOWER(segment) LIKE LOWER(%s)
         )
         LIMIT 5;
-    """.format(selected_market)
+    """
     
     try:
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query)
+                cursor.execute(query,(selected_market + '%', '%' + selected_market + '%'))
                 rows = cursor.fetchall()
                 similar_markets.extend([row[0] for row in rows])
     except Exception as e:
@@ -660,9 +660,11 @@ def main():
                             }
                         </style>
                         """, unsafe_allow_html=True)
+                        # Escape the content to ensure no special formatting is retained
+                        escaped_content = html.escape(rephrased_content)
 
                         # Display the rephrased content within a <div> using the .font-style class
-                        st.markdown(f'<div class="font-style">{rephrased_content}</div>', unsafe_allow_html=True)
+                        st.markdown(f'<div class="font-style">{escaped_content}</div>', unsafe_allow_html=True)
                         reportlink = get_reportlink(selected_market, conn_str)
                         st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
@@ -699,9 +701,11 @@ def main():
                                     }
                                 </style>
                                 """, unsafe_allow_html=True)
+                                # Escape the content to ensure no special formatting is retained
+                                escaped_content = html.escape(rephrased_content)
 
                                 # Display the rephrased content within a <div> using the .font-style class
-                                st.markdown(f'<div class="font-style">{rephrased_content}</div>', unsafe_allow_html=True)
+                                st.markdown(f'<div class="font-style">{escaped_content}</div>', unsafe_allow_html=True)
                                 reportlink = get_reportlink(selected_market, conn_str)
                                 st.write(f"If you need further details :  {reportlink}")
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
