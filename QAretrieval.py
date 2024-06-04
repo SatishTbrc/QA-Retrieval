@@ -5,6 +5,7 @@ import os
 from langchain.llms import OpenAI
 from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
+import html
 
 # Setting up LangChain for rephrasing text
 api_key = os.getenv("API_KEY")  # Ensure your API key is correctly set in your environment variables
@@ -224,32 +225,43 @@ def check_region_data_availability(selected_market, selected_country, conn_str):
 
 def get_top_5_similar_markets_from_database(selected_market, conn_str):
     similar_markets = []
-    query = """
-        (
+    query_starts_with = """
         SELECT DISTINCT segment 
         FROM public.market_data 
         WHERE LOWER(segment) LIKE LOWER(%s)
-        )
-        UNION
-        (
+        LIMIT 5;
+    """
+    
+    query_contains = """
         SELECT DISTINCT segment 
         FROM public.market_data 
         WHERE LOWER(segment) LIKE LOWER(%s)
-        )
+        AND LOWER(segment) NOT LIKE LOWER(%s)
         LIMIT 5;
     """
     
     try:
         with psycopg2.connect(conn_str) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(query,(selected_market + '%', '%' + selected_market + '%'))
+                # First query: segments starting with the selected_market
+                cursor.execute(query_starts_with, (selected_market + '%',))
                 rows = cursor.fetchall()
                 similar_markets.extend([row[0] for row in rows])
+                
+                # Check if we need more suggestions to fill the top 5
+                if len(similar_markets) < 5:
+                    # Second query: segments containing the selected_market
+                    cursor.execute(query_contains, ('%' + selected_market + '%', selected_market + '%'))
+                    rows = cursor.fetchall()
+                    similar_markets.extend([row[0] for row in rows])
+                    
+                # Ensure we only return the top 5 suggestions
+                similar_markets = similar_markets[:5]
+                
     except Exception as e:
         print(f"Database error: {e}")
     
     return similar_markets
-
 def find_region_for_country(country_name, conn_str):
     query = """
         SELECT region
