@@ -10,7 +10,7 @@ import html
 # Setting up LangChain for rephrasing text
 api_key = os.getenv("API_KEY")  # Ensure your API key is correctly set in your environment variables
 davinci = OpenAI(api_key=api_key, model_name="gpt-3.5-turbo-instruct")
-template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights:
+template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights. All start each point with capital letter only, this is very important:
 
 Content: {content}
 
