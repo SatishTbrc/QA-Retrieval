@@ -43,7 +43,7 @@ def save_to_database(selected_market, selected_data_type, rephrased_content, con
 
             if exists == 0:  # If the entry does not exist, insert new data
                 insert_query = """
-                    INSERT INTO output_data ("Market", "Data", "Answer") VALUES (LOWER(%s), LOWER(%s), LOWER(%s))
+                    INSERT INTO output_data ("Market", "Data", "Answer") VALUES (LOWER(%s), LOWER(%s), %s)
                 """
                 cursor.execute(insert_query, (selected_market, selected_data_type, rephrased_content))
                 conn.commit()
