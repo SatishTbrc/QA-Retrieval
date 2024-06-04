@@ -225,10 +225,18 @@ def check_region_data_availability(selected_market, selected_country, conn_str):
 def get_top_5_similar_markets_from_database(selected_market, conn_str):
     similar_markets = []
     query = """
+        (
         SELECT DISTINCT segment 
         FROM public.market_data 
-        WHERE LOWER(segment) LIKE LOWER('%{}%')
-        LIMIT 5
+        WHERE LOWER(segment) LIKE LOWER('{}%')
+        )
+        UNION
+        (
+        SELECT DISTINCT segment 
+        FROM public.market_data 
+        WHERE LOWER(segment) LIKE LOWER('%{}%') AND segment NOT LIKE LOWER('{}%')
+        )
+        LIMIT 5;
     """.format(selected_market)
     
     try:
@@ -642,7 +650,19 @@ def main():
                             st.write(f"Key restraints in the {selected_market} market are:")
                         if selected_data_type == "Competitive Landscape":
                             st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
-                        st.write(rephrased_content)
+                        #st.write(rephrased_content)
+                        # Define CSS for consistent font style
+                        st.markdown("""
+                        <style>
+                            .font-style {
+                                font-family: 'Corbel', sans-serif;
+                                font-size: 14px;
+                            }
+                        </style>
+                        """, unsafe_allow_html=True)
+
+                        # Display the rephrased content within a <div> using the .font-style class
+                        st.markdown(f'<div class="font-style">{rephrased_content}</div>', unsafe_allow_html=True)
                         reportlink = get_reportlink(selected_market, conn_str)
                         st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
@@ -669,7 +689,19 @@ def main():
                                     st.write(f"Key restraints in the {selected_market} market are:")
                                 if selected_data_type == "Competitive Landscape":
                                     st.write(f"Key insights on the competitive landscape of the {selected_market} market are:")
-                                st.write(rephrased_content)
+                                #st.write(rephrased_content)
+                                # Define CSS for consistent font style
+                                st.markdown("""
+                                <style>
+                                    .font-style {
+                                        font-family: 'Corbel', sans-serif;
+                                        font-size: 14px;
+                                    }
+                                </style>
+                                """, unsafe_allow_html=True)
+
+                                # Display the rephrased content within a <div> using the .font-style class
+                                st.markdown(f'<div class="font-style">{rephrased_content}</div>', unsafe_allow_html=True)
                                 reportlink = get_reportlink(selected_market, conn_str)
                                 st.write(f"If you need further details :  {reportlink}")
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
