@@ -342,7 +342,7 @@ def handle_selected_market(selected_market):
     if check_market_in_database(selected_market, conn_str):
         return True
     else:
-        st.write("Unfortunately, we don’t cover this market in the Global Market Model, but here are some similar markets you might be interested in:")
+        st.write("Unfortunately, we don’t cover this exact market in the Global Market Model, but here are some similar markets you might be interested in:")
         #similar_markets_query = f"SELECT segment FROM (SELECT DISTINCT segment FROM public.market_data WHERE LOWER(segment) LIKE LOWER('%{selected_market}%')) subquery ORDER BY RANDOM() LIMIT 5"
         similar_markets = get_top_5_similar_markets_from_database(selected_market, conn_str)
         if not similar_markets:
@@ -667,8 +667,8 @@ def main():
                         st.markdown("""
                         <style>
                             .font-style {
-                                font-family: 'Corbel', sans-serif;
-                                font-size: 14px;
+                                font-family: 'Roboto', sans-serif;
+                                font-size: 16px;
                             }
                         </style>
                         """, unsafe_allow_html=True)
@@ -708,8 +708,8 @@ def main():
                                 st.markdown("""
                                 <style>
                                     .font-style {
-                                        font-family: 'Corbel', sans-serif;
-                                        font-size: 14px;
+                                        font-family: 'Roboto', sans-serif;
+                                        font-size: 16px;
                                     }
                                 </style>
                                 """, unsafe_allow_html=True)
