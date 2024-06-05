@@ -583,7 +583,8 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
@@ -606,7 +607,8 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
@@ -773,7 +775,8 @@ def main():
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
@@ -795,7 +798,8 @@ def main():
                                 st.write(f"If you need further details or comparisons:  {hyperlink}")
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
@@ -826,7 +830,8 @@ def main():
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
                                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
-                                        if further_assistance:
+                                        entere_button = st.button("Continue")
+                                        if further_assistance or entere_button:
                                             # Clear session state variables
                                             st.session_state.market = further_assistance
                                             if 'data_type' not in st.session_state:
@@ -848,7 +853,8 @@ def main():
                                         st.write(f"If you need further details or comparisons:  {hyperlink}")
                                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                         further_datatype = "select option below"
-                                        if further_assistance:
+                                        entere_button = st.button("Continue")
+                                        if further_assistance or entere_button:
                                             # Clear session state variables
                                             st.session_state.market = further_assistance
                                             if 'data_type' not in st.session_state:
