@@ -380,7 +380,8 @@ def handle_selected_market(selected_market):
                         st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
-                        if further_assistance:
+                        entere_button = st.button("Continue")
+                        if further_assistance or entere_button:
                             # Clear session state variables
                             st.session_state.market = further_assistance
                             if 'data_type' not in st.session_state:
@@ -408,7 +409,8 @@ def handle_selected_market(selected_market):
                                 save_to_database(selected_similar_market, selected_data_type, rephrased_content, conn_str)
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
@@ -629,8 +631,9 @@ def main():
 
 
     selected_market = st.text_input("", value = st.session_state.market)
+    enter_button = st.button("Enter")
 
-    if selected_market:
+    if selected_market or enter_button:
         
 
         success_selected_market = handle_selected_market(selected_market)
@@ -681,7 +684,8 @@ def main():
                         st.write(f"If you need further details :  {reportlink}")
                         further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                         further_datatype = "select option below"
-                        if further_assistance:
+                        entere_button = st.button("Continue")
+                        if further_assistance or entere_button:
                             # Clear session state variables
                             st.session_state.market = further_assistance
                             if 'data_type' not in st.session_state:
@@ -723,7 +727,8 @@ def main():
                                 save_to_database(selected_market, selected_data_type, rephrased_content, conn_str)
                                 further_assistance = st.text_input("What would you like to search for next? Please specify which market you are seeking information on in the text box below ?")
                                 further_datatype = "select option below"
-                                if further_assistance:
+                                entere_button = st.button("Continue")
+                                if further_assistance or entere_button:
                                     # Clear session state variables
                                     st.session_state.market = further_assistance
                                     if 'data_type' not in st.session_state:
