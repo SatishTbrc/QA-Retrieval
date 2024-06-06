@@ -635,6 +635,13 @@ def main():
     if 'country' not in st.session_state:  # Add this line to initialize the 'country' variable
         st.session_state.country = ""
 
+    # Reset selected_data_type if further assistance is provided
+    if 'selected_data_type' not in st.session_state:
+        st.session_state.selected_data_type = "select option below"
+    elif st.session_state.get('reset_selected_data_type', False):
+        st.session_state.selected_data_type = "select option below"
+        st.session_state.reset_selected_data_type = False
+
 
     selected_market = st.text_input("", value = st.session_state.market)
     enter_button = st.button("Enter")
@@ -692,12 +699,9 @@ def main():
                         further_datatype = "select option below"
                         entere_button = st.button("Continue")
                         if further_assistance or entere_button:
-                            # Clear session state variables
                             st.session_state.market = further_assistance
-                            if 'data_type' not in st.session_state:
-                                st.session_state.data_type = ""
-                            st.session_state.country = ""
-
+                            st.session_state.data_type = ""
+                            st.session_state.reset_selected_data_type = True  # Trigger reset on next run
                             # Rerun the app
                             st.experimental_rerun()
                     else:
@@ -735,12 +739,9 @@ def main():
                                 further_datatype = "select option below"
                                 entere_button = st.button("Continue")
                                 if further_assistance or entere_button:
-                                    # Clear session state variables
                                     st.session_state.market = further_assistance
-                                    if 'data_type' not in st.session_state:
-                                        st.session_state.data_type = ""
-                                    st.session_state.country = ""
-
+                                    st.session_state.data_type = ""
+                                    st.session_state.reset_selected_data_type = True  # Trigger reset on next run
                                     # Rerun the app
                                     st.experimental_rerun()
                             else:
