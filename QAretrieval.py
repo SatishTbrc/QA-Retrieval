@@ -647,7 +647,8 @@ def main():
     enter_button = st.button("Enter")
 
     if selected_market or enter_button:
-        
+        st.session_state.market = selected_market
+        st.session_state.data_type = ""
 
         success_selected_market = handle_selected_market(selected_market)
         if success_selected_market:
@@ -662,7 +663,9 @@ def main():
                 #data_type_options.append("Market Size")
 
             data_type_options = available_market_size + available_data_types
-            selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options)
+            if 'selected_data_type' not in st.session_state:
+                st.session_state.selected_data_type = "select option below"
+            selected_data_type = st.selectbox("What type of data are you looking for?", ["Select Option Below"] + data_type_options,index=0,key='selected_data_type')
             if selected_data_type != "Select Option Below":
                 st.session_state.data_type = selected_data_type
 
