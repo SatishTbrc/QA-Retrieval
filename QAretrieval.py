@@ -7,6 +7,11 @@ from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 import html
 
+LANGCHAIN_TRACING_V2= os.getenv("LANGCHAIN_TRACING_V2")
+LANGCHAIN_ENDPOINT= os.getenv("LANGCHAIN_ENDPOINT")
+LANGCHAIN_API_KEY= os.getenv("LANGCHAIN_API_KEY")
+LANGCHAIN_PROJECT= os.getenv("LANGCHAIN_PROJECT")
+
 # Setting up LangChain for rephrasing text
 api_key = os.getenv("API_KEY")  # Ensure your API key is correctly set in your environment variables
 davinci = OpenAI(api_key=api_key, model_name="gpt-3.5-turbo-instruct")
