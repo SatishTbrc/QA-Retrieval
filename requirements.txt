@@ -1,5 +1,5 @@
 langchain==0.0.339
-langchain-community==0.2.4
+langchain-community==0.0.16
 langchainplus-sdk==0.0.7
 langsmith==0.0.84
 streamlit==1.23.1
