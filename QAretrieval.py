@@ -17,7 +17,7 @@ LANGCHAIN_PROJECT= os.getenv("LANGCHAIN_PROJECT")
 api_key = os.getenv("API_KEY")  # Ensure your API key is correctly set in your environment variables
 os.environ["OPENAI_API_KEY"] = api_key
 #davinci = OpenAI(model_name="gpt-3.5-turbo-instruct")
-davinci = OpenAI(model="gpt-3.5-turbo-instruct", api_key=api_key)
+davinci = OpenAI(model="gpt-3.5-turbo-instruct", api_key=os.getenv("API_KEY"))
 template = """You are an experienced business analyst skilled in summarizing complex research findings into clear, concise abstracts. Generate a summary of the content from a detailed business research report. The output should be succinct with bullet points and should distill the essence of the content, highlighting key insights. All start each point with capital letter only, this is very important:
 
 Content: {content}
@@ -895,6 +895,7 @@ if __name__ == "__main__":
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
     main()
+
 
 
 
