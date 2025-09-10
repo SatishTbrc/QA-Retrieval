@@ -305,8 +305,8 @@ def get_top_5_geographies_for_market_and_region(selected_market, region, conn_st
 
 def fetch_answer_from_database(selected_market, data_type, selected_country, conn_str):
     years = {
-        "Historical data": ['2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
-        "Forecast data": ['2023', '2024', '2025', '2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033']
+        "Historical data": ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'],
+        "Forecast data": ['2026', '2027', '2028', '2029', '2030', '2031', '2032', '2033', '2034', '2035']
     }
     
     query = ""
@@ -448,7 +448,7 @@ def handle_selected_market(selected_market):
                                 if error:
                                     st.write(error)
                                 else:
-                                    st.write(f"Here's the historical data of {selected_similar_market} of Global for the year 2013-2023:")
+                                    st.write(f"Here's the historical data of {selected_similar_market} of Global for the year 2016-2025:")
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
@@ -472,7 +472,7 @@ def handle_selected_market(selected_market):
                                 if error:
                                     st.write(error)
                                 else:
-                                    st.write(f"Here's the forecast data of {selected_similar_market} of Global for the year 2023-2033:")
+                                    st.write(f"Here's the forecast data of {selected_similar_market} of Global for the year 2026-2035:")
                                     df = pd.DataFrame(data[1:], columns=data[0])
                                     df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                     st.dataframe(df)
@@ -504,7 +504,7 @@ def handle_selected_market(selected_market):
                                         if error:
                                             st.write(error)
                                         else:
-                                            st.write(f"Here's the historical data of {selected_similar_market} of {selected_country} for the year 2013 - 2023:")
+                                            st.write(f"Here's the historical data of {selected_similar_market} of {selected_country} for the year 2016 - 2025:")
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
@@ -528,7 +528,7 @@ def handle_selected_market(selected_market):
                                         if error:
                                             st.write(error)
                                         else:
-                                            st.write(f"Here's the forecast data of {selected_similar_market} of {selected_country} for the year 2023 - 2033:")
+                                            st.write(f"Here's the forecast data of {selected_similar_market} of {selected_country} for the year 2026 - 2035:")
                                             df = pd.DataFrame(data[1:], columns=data[0])
                                             df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                             st.dataframe(df)
@@ -581,7 +581,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the historical data of {selected_market} of {selected_similar_geography} for the year 2013 - 2023:")
+                                st.write(f"Here's the historical data of {selected_market} of {selected_similar_geography} for the year 2016 - 2025:")
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
@@ -605,7 +605,7 @@ def process_market_size_data(selected_market, selected_country, selected_data_ty
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the forecast data of {selected_market} of {selected_similar_geography} for the year 2023-2033:")
+                                st.write(f"Here's the forecast data of {selected_market} of {selected_similar_geography} for the year 2026-2035:")
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
@@ -777,7 +777,7 @@ def main():
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the historical data of {selected_market} of Global for the year 2013-2023:")
+                                st.write(f"Here's the historical data of {selected_market} of Global for the year 2016-2025:")
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
@@ -800,7 +800,7 @@ def main():
                             if error:
                                 st.write(error)
                             else:
-                                st.write(f"Here's the forecast data of {selected_market} of Global for the year 2023-2033:")
+                                st.write(f"Here's the forecast data of {selected_market} of Global for the year 2026-2035:")
                                 df = pd.DataFrame(data[1:], columns=data[0])
                                 df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                 st.dataframe(df)
@@ -832,7 +832,7 @@ def main():
                                     if error:
                                         st.write(error)
                                     else:
-                                        st.write(f"Here's the historical data of {selected_market}  of {selected_country} for the year 2013-2023:")
+                                        st.write(f"Here's the historical data of {selected_market}  of {selected_country} for the year 2016-2025:")
                                         df = pd.DataFrame(data[1:], columns=data[0])
                                         df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                         st.dataframe(df)
@@ -855,7 +855,7 @@ def main():
                                     if error:
                                         st.write(error)
                                     else:
-                                        st.write(f"Here's the forecast data of {selected_market} of {selected_country} for the year 2023-2033:")
+                                        st.write(f"Here's the forecast data of {selected_market} of {selected_country} for the year 2026-2035:")
                                         df = pd.DataFrame(data[1:], columns=data[0])
                                         df = df.set_index(df.columns[0], drop=True)  # Set the index to None, removing it
                                         st.dataframe(df)
@@ -893,4 +893,5 @@ if __name__ == "__main__":
     st.subheader("Hello! Please specify which market you are seeking information on? You can type the market name in the text box below:")
 
     main()
+
 
