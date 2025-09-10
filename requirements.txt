@@ -1,8 +1,10 @@
-langchain==0.0.339
-langchain-community==0.0.16
+langchain==0.2.10
+langchain-community==0.2.10
+langchain-openai==0.1.7
 langchainplus-sdk==0.0.7
 langsmith==0.0.84
 streamlit==1.23.1
 psycopg2==2.9.9
 pandas==1.5.3
 openai==1.26.0
+
